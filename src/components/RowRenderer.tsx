@@ -13,7 +13,7 @@ export function RowRenderer({ rows }: RowRendererProps) {
     if (!rows || rows.length === 0) return null
 
     return (
-        <div className="flex flex-col space-y-24 w-full">
+        <div className="flex flex-col space-y-[20px] w-full">
             {rows.map((row) => {
                 // Validate items length before rendering to avoid index errors
                 if (row.layout === 'full' && row.items?.length !== 1) return null

@@ -10,7 +10,7 @@ interface CurationGridProps {
 
 export function CurationGrid({ items }: CurationGridProps) {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-[20px]">
             {items.map((item) => (
                 <a
                     key={item._id}
@@ -19,7 +19,7 @@ export function CurationGrid({ items }: CurationGridProps) {
                     rel="noopener noreferrer"
                     className="group flex flex-col space-y-3"
                 >
-                    <div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100 transition-all duration-300 group-hover:shadow-md">
+                    <div className="relative aspect-square overflow-hidden rounded-[30px] bg-gray-100 transition-all duration-300">
                         {item.image && (
                             <Image
                                 loader={sanityLoader}

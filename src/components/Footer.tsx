@@ -14,16 +14,16 @@ export function Footer() {
                 </div>
                 <button
                     onClick={scrollToTop}
-                    className="p-2 bg-black text-white rounded-full hover:scale-110 transition-transform duration-300"
+                    className="p-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-300 cursor-pointer"
                     aria-label="Back to top"
                 >
                     <svg
-                        width="20"
-                        height="20"
+                        width="28"
+                        height="28"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="3"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     >

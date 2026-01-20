@@ -46,16 +46,16 @@ export function Header() {
     const isDark = pathname === '/photography'
 
     return (
-        <header className="container-text pt-8 md:pt-16 mb-16 max-w-none h-[600px] flex flex-col justify-start">
+        <header className="container-text pt-8 md:pt-16 mb-16 max-w-none min-h-[50vh] md:h-[600px] flex flex-col justify-start">
             <h1 className={clsx(
-                "text-[64px] font-bold leading-[75px] mb-8",
+                "text-[40px] leading-[1.1] md:text-[64px] md:leading-[75px] font-bold mb-6 md:mb-8",
                 isDark ? "text-white" : "text-black"
             )}>
                 Osman Köycü, <br />
                 {content.title}
             </h1>
             <div className={clsx(
-                "text-[40px] font-semibold leading-[50px]",
+                "text-[20px] leading-[1.4] md:text-[40px] md:leading-[50px] font-semibold",
                 isDark ? "text-[#9c9c9c]" : "text-black"
             )}>
                 {content.description}

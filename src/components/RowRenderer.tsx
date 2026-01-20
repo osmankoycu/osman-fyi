@@ -15,7 +15,7 @@ export function RowRenderer({ rows }: RowRendererProps) {
     if (!rows || rows.length === 0) return null
 
     return (
-        <div className="flex flex-col space-y-[20px] w-full">
+        <div className="flex flex-col space-y-[10px] md:space-y-[20px] w-full">
             {rows.map((row, index) => {
                 // Validate items length before rendering to avoid index errors
                 if (row.layout === 'full' && row.items?.length !== 1) return null
@@ -45,11 +45,11 @@ export function RowRenderer({ rows }: RowRendererProps) {
                         )}
 
                         {row.layout === 'two' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px] md:gap-5 items-start">
                                 {row.items.map((item, idx) => (
                                     <div key={idx} className="w-full">
-                                        {item._type === 'imageCard' && <ImageCard {...item} />}
-                                        {item._type === 'textCard' && <TextCard {...item} />}
+                                        {item._type === 'imageCard' && <ImageCard {...item} mobileHeightClass="h-[500px]" />}
+                                        {item._type === 'textCard' && <TextCard {...item} className="min-h-[500px]" />}
                                     </div>
                                 ))}
                             </div>

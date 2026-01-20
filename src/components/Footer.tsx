@@ -12,11 +12,11 @@ export function Footer() {
     const isDark = pathname === '/photography'
 
     return (
-        <footer className="w-full mt-32 pb-10">
+        <footer className="w-full mt-16 md:mt-32 pb-10">
             <div className={clsx("separator mb-10", isDark ? "!bg-[#1F1F1F]" : "bg-gray-200")} />
-            <div className="container-text flex items-center justify-between">
+            <div className="container-text flex flex-col md:flex-row items-center md:justify-between gap-6 md:gap-0">
                 <div className={clsx(
-                    "text-[22px] font-bold",
+                    "text-[16px] md:text-[22px] font-bold",
                     isDark ? "text-white" : "text-black"
                 )}>
                     Osman Köycü, Copyright © 2026

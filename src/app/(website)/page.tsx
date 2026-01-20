@@ -25,11 +25,11 @@ export default async function Home() {
                                 {/* Project Header - Text Container (1100px) */}
                                 <header className="container-text mb-12">
                                     <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-0">
-                                        <h3 className="text-[64px] font-bold leading-[75px] text-black">
+                                        <h3 className="text-[40px] leading-[1.1] md:text-[64px] md:leading-[75px] font-bold text-black">
                                             {project.title}
                                         </h3>
                                     </div>
-                                    <div className="flex justify-between items-end text-[22px] font-semibold text-[#9C9C9C]">
+                                    <div className="flex justify-between items-end text-[18px] md:text-[22px] font-semibold text-[#9C9C9C]">
                                         <span>{project.roleLine}</span>
                                         <span className="text-black">{project.year || '2024'}</span>
                                     </div>

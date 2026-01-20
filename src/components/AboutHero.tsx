@@ -13,7 +13,7 @@ export function AboutHero({ image, alt }: AboutHeroProps) {
     if (!image) return null
 
     return (
-        <div className="relative overflow-hidden rounded-[30px] bg-gray-100 w-full h-[300px] md:h-[675px] mb-16">
+        <div className="relative overflow-hidden rounded-[30px] bg-gray-100 w-full h-[200px] md:h-[675px] mb-16">
             <Image
                 loader={sanityLoader}
                 src={image.asset._ref}

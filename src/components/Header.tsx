@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { clsx } from 'clsx'
 
 export function Header() {
     const pathname = usePathname()
@@ -42,13 +43,21 @@ export function Header() {
 
     const content = getContent()
 
+    const isDark = pathname === '/photography'
+
     return (
         <header className="container-text pt-8 md:pt-16 mb-16 max-w-none h-[600px] flex flex-col justify-start">
-            <h1 className="text-[64px] font-bold leading-[75px] text-black mb-8">
+            <h1 className={clsx(
+                "text-[64px] font-bold leading-[75px] mb-8",
+                isDark ? "text-white" : "text-black"
+            )}>
                 Osman Köycü, <br />
                 {content.title}
             </h1>
-            <div className="text-[40px] font-semibold leading-[50px] text-black">
+            <div className={clsx(
+                "text-[40px] font-semibold leading-[50px]",
+                isDark ? "text-[#9c9c9c]" : "text-black"
+            )}>
                 {content.description}
             </div>
         </header>

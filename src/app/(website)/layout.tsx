@@ -4,9 +4,10 @@ import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 
 import { Header } from '@/components/Header'
+import { ThemeRegistry } from '@/components/ThemeRegistry'
 
 export const metadata: Metadata = {
-    title: 'Osman Köycu',
+    title: 'Osman Köycü',
     description: 'Product Designer based in New York.',
 }
 
@@ -21,6 +22,7 @@ export default function RootLayout({
                 <link rel="stylesheet" href="https://use.typekit.net/skt3avi.css" />
             </head>
             <body>
+                <ThemeRegistry />
                 <Header />
                 <Navbar />
                 <main className="min-h-screen">

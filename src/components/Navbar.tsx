@@ -41,11 +41,14 @@ export function Navbar() {
         { label: isStuck ? 'Osman Köycü' : 'About', href: '/about' },
     ]
 
+    const isDark = pathname === '/photography'
+
     return (
         <nav
             className={clsx(
-                'w-full sticky top-0 z-50 bg-white border-b border-gray-200 flex items-center mb-24 transition-all duration-300',
-                isStuck ? 'h-[100px]' : 'h-[130px]'
+                'w-full sticky top-0 z-50 border-b-2 flex items-center mb-24 transition-[height] duration-300',
+                isStuck ? 'h-[100px]' : 'h-[130px]',
+                isDark ? 'bg-black border-[#1F1F1F]' : 'bg-white border-gray-200'
             )}
         >
             <div className="container-text flex items-center justify-between w-full">
@@ -61,10 +64,10 @@ export function Navbar() {
                                 key={item.href}
                                 href={item.href}
                                 className={clsx(
-                                    'px-5 py-2.5 rounded-full transition-all duration-200 text-[22px] font-bold text-black',
+                                    'px-5 py-2.5 rounded-full transition-all duration-200 text-[22px] font-bold',
                                     isActive
-                                        ? 'bg-black text-white'
-                                        : 'hover:bg-gray-100'
+                                        ? (isDark ? 'bg-white text-black' : 'bg-black text-white')
+                                        : (isDark ? 'text-white hover:bg-[#1F1F1F]' : 'text-black hover:bg-gray-100')
                                 )}
                             >
                                 {item.label}
@@ -75,7 +78,10 @@ export function Navbar() {
 
                 <a
                     href="mailto:osmankoycu@gmail.com"
-                    className="text-black cursor-pointer transition-opacity hover:opacity-70"
+                    className={clsx(
+                        "cursor-pointer transition-opacity hover:opacity-70",
+                        isDark ? "text-white" : "text-black"
+                    )}
                     aria-label="Send email"
                 >
                     <Image
@@ -83,6 +89,7 @@ export function Navbar() {
                         width={32}
                         height={32}
                         alt="Contact"
+                        className={isDark ? "invert" : ""}
                     />
                 </a>
             </div>

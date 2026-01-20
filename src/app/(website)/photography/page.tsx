@@ -20,12 +20,12 @@ export default async function PhotographyPage() {
                     <article key={city._id} className="w-full">
                         {/* City Header - Text Container (1100px) */}
                         <header className="container-text mb-12 max-w-none">
-                            <h3 className="text-[64px] font-bold leading-[75px] text-black mb-0">
+                            <h3 className="text-[64px] font-bold leading-[75px] text-white mb-0">
                                 {city.title}
                             </h3>
                             <div className="flex justify-between items-end text-[22px] font-semibold text-[#9C9C9C]">
                                 <span>{city.subtitle}</span>
-                                <span className="text-black">{city.country}</span>
+                                <span className="text-white">{city.country}</span>
                             </div>
                         </header>
 

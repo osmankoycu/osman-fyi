@@ -33,7 +33,7 @@ export function Header() {
                     title: 'Independent Designer.',
                     description: (
                         <>
-                            I enjoy creating and experimenting with new ideas. <br />
+                            I enjoy creating and experimenting with new ideas.
                             Currently working on <a href="http://image.inc" target="_blank" rel="noopener noreferrer" className="text-black border-b-2 border-black pb-0.5 hover:text-[#1F1F1F] hover:border-[#1F1F1F] transition-colors">Image Inc.</a> based in New York.
                         </>
                     )
@@ -55,7 +55,7 @@ export function Header() {
                 {content.title}
             </h1>
             <div className={clsx(
-                "text-[20px] leading-[1.4] md:text-[40px] md:leading-[50px] font-semibold",
+                "text-[40px] leading-[1.1] md:text-[64px] md:leading-[75px] font-medium",
                 isDark ? "text-[#9c9c9c]" : "text-black"
             )}>
                 {content.description}

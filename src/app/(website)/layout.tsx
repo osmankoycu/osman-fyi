@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
 
-const inter = Inter({ subsets: ['latin'] })
+import { Header } from '@/components/Header'
 
 export const metadata: Metadata = {
     title: 'Osman Köycu',
@@ -17,11 +17,16 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={inter.className}>
+            <head>
+                <link rel="stylesheet" href="https://use.typekit.net/skt3avi.css" />
+            </head>
+            <body>
+                <Header />
                 <Navbar />
-                <main className="pt-24 min-h-screen">
+                <main className="min-h-screen">
                     {children}
                 </main>
+                <Footer />
             </body>
         </html>
     )

@@ -15,28 +15,9 @@ export default async function Home() {
     }
 
     return (
-        <div className="container-custom pt-8 md:pt-16 pb-24">
-            {/* Static Hero */}
-            <section className="mb-24 md:mb-32 max-w-2xl">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-8">
-                    Osman Köycu, <br />
-                    Independent Designer.
-                </h1>
-                <p className="text-xl md:text-2xl font-medium text-gray-600 leading-relaxed md:leading-relaxed">
-                    I enjoy creating and experimenting with new ideas.
-                    Currently working on <span className="text-black border-b-2 border-black pb-0.5">Image Inc.</span>, based in New York.
-                </p>
-            </section>
-
+        <div className="container-custom pb-24">
             {/* Product List with Inline Content */}
             <section>
-                <div className="flex items-center justify-between mb-16 border-b border-gray-100 pb-2">
-                    <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
-                        Selected Work
-                    </h2>
-                    <span className="text-sm text-gray-400">2024 — Present</span>
-                </div>
-
                 <div className="flex flex-col space-y-32">
                     {products.length > 0 ? (
                         products.map((project) => (

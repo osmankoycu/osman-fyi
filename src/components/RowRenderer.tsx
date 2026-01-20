@@ -33,7 +33,7 @@ export function RowRenderer({ rows }: RowRendererProps) {
                         )}
 
                         {row.layout === 'two' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
                                 {row.items.map((item, idx) => (
                                     <div key={idx} className="w-full">
                                         {item._type === 'imageCard' && <ImageCard {...item} />}

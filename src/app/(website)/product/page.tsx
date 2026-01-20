@@ -14,12 +14,7 @@ export default async function ProductPage() {
     }
 
     return (
-        <div className="container-custom pt-8 md:pt-16 pb-24">
-            <header className="mb-24">
-                <h1 className="text-3xl font-bold tracking-tight mb-2">Product</h1>
-                <p className="text-gray-500 text-lg">Digital products and systems.</p>
-            </header>
-
+        <div className="container-custom pb-24">
             <div className="flex flex-col space-y-32">
                 {products.length > 0 ? (
                     products.map((project) => (

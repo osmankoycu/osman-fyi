@@ -14,12 +14,7 @@ export default async function ExperimentsPage() {
     }
 
     return (
-        <div className="container-custom pt-8 md:pt-16 pb-24">
-            <header className="mb-24">
-                <h1 className="text-3xl font-bold tracking-tight mb-2">Experiments</h1>
-                <p className="text-gray-500 text-lg">Playful explorations and prototypes.</p>
-            </header>
-
+        <div className="container-custom pb-24">
             <div className="flex flex-col space-y-32">
                 {experiments.length > 0 ? (
                     experiments.map((project) => (

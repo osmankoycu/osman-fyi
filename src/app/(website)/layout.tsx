@@ -5,6 +5,7 @@ import { Footer } from '@/components/Footer'
 
 import { Header } from '@/components/Header'
 import { ThemeRegistry } from '@/components/ThemeRegistry'
+import { SmoothScroll } from '@/components/SmoothScroll'
 
 export const metadata: Metadata = {
     title: 'Osman Köycü',
@@ -42,6 +43,7 @@ export default function RootLayout({
                 <link rel="stylesheet" href="https://use.typekit.net/skt3avi.css" />
             </head>
             <body>
+                <SmoothScroll />
                 <ThemeRegistry />
                 <Header />
                 <Navbar />

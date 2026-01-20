@@ -8,6 +8,7 @@ export interface SanityImage {
     }
     hotspot?: any
     crop?: any
+    alt?: string
 }
 
 export interface ImageCardData {
@@ -59,4 +60,10 @@ export interface CurationItemData {
     title: string
     image: SanityImage
     url: string
+}
+
+export interface AboutPageData {
+    _id: string
+    heroImage?: SanityImage
+    bio?: PortableTextBlock[]
 }

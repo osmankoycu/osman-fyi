@@ -11,12 +11,15 @@ export const projectsByTypeQuery = groq`
     rows[] {
       _key,
       layout,
+      backgroundColor,
       items[] {
         _type,
         image,
         alt,
         caption,
-        text
+        text,
+        backgroundColor,
+        textColor
       }
     }
   }
@@ -32,11 +35,14 @@ export const photoCitiesQuery = groq`
     rows[] {
       _key,
       layout,
+      backgroundColor,
       items[] {
         _type,
         image,
         alt,
-        caption
+        caption,
+        backgroundColor,
+        textColor
       }
     }
   }

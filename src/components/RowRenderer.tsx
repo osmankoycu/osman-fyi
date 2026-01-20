@@ -20,7 +20,11 @@ export function RowRenderer({ rows }: RowRendererProps) {
                 if (row.layout === 'two' && row.items?.length !== 2) return null
 
                 return (
-                    <section key={row._key} className="w-full">
+                    <section
+                        key={row._key}
+                        className="w-full"
+                        style={{ backgroundColor: row.backgroundColor }}
+                    >
                         {row.layout === 'full' && (
                             <div className="w-full">
                                 {row.items.map((item, idx) => (

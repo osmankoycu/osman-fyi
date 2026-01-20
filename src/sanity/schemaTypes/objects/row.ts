@@ -19,6 +19,12 @@ export const row = defineType({
             validation: (rule) => rule.required(),
         }),
         defineField({
+            name: 'backgroundColor',
+            title: 'Background Color',
+            type: 'string',
+            description: 'Optional hex color (e.g., #FFFFFF). Leave empty for default.',
+        }),
+        defineField({
             name: 'items',
             title: 'Items',
             type: 'array',

@@ -20,6 +20,8 @@ export interface ImageCardData {
 export interface TextCardData {
     _type: 'textCard'
     text: PortableTextBlock[]
+    backgroundColor?: string
+    textColor?: string
 }
 
 export type RowItem = ImageCardData | TextCardData
@@ -29,6 +31,7 @@ export interface RowData {
     _type: 'row'
     layout: 'full' | 'two'
     items: RowItem[]
+    backgroundColor?: string
 }
 
 export interface ProjectData {

@@ -8,15 +8,21 @@ interface TextCardProps extends TextCardData {
     className?: string
 }
 
-export function TextCard({ text, className }: TextCardProps) {
+export function TextCard({ text, className, backgroundColor, textColor }: TextCardProps) {
     if (!text) return null
 
     return (
-        <div className={clsx(
-            'flex flex-col justify-center p-8 md:p-12 bg-gray-50 rounded-[30px] h-full min-h-[300px] md:h-[675px]',
-            'text-[40px] font-semibold leading-[50px] text-black',
-            className
-        )}>
+        <div
+            className={clsx(
+                'flex flex-col justify-center p-8 md:p-12 bg-gray-50 rounded-[30px] h-full min-h-[300px] md:h-[675px]',
+                'text-[40px] font-semibold leading-[50px] text-black',
+                className
+            )}
+            style={{
+                backgroundColor,
+                color: textColor,
+            }}
+        >
             <PortableText value={text} />
         </div>
     )

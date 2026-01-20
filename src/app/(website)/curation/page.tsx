@@ -16,7 +16,7 @@ export default async function CurationPage() {
     return (
         <div className="container-custom pt-8 md:pt-16 pb-24">
             <div className="mb-12">
-                <h1 className="text-[64px] font-bold leading-tight text-black mb-2">Curation</h1>
+                <h1 className="text-[64px] font-bold leading-[75px] text-black mb-2">Curation</h1>
                 <p className="text-[40px] font-semibold leading-[50px] text-black">Things I use and recommend.</p>
             </div>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { urlFor } from '@/lib/sanity.client'
+import { urlFor, sanityLoader } from '@/lib/sanity.client'
 import { ImageCardData } from '@/types'
 import { clsx } from 'clsx'
 
@@ -24,12 +24,13 @@ export function ImageCard({ image, alt, caption, className }: ImageCardProps) {
              We'll use width=0 height=0 sizes=100vw style={{width:'100%', height:'auto'}} to strict responsive.
          */}
                 <Image
-                    src={urlFor(image).url()}
+                    loader={sanityLoader}
+                    src={image.asset._ref} // Loader expects the source (ref or object) as src
                     alt={alt || 'Project Image'}
-                    width={1200}
-                    height={800}
+                    width={1600} // Increased intrinsic width for better detail
+                    height={1000}
                     className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.01]"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
                 />
             </div>
             {caption && (

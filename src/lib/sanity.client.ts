@@ -16,3 +16,14 @@ const builder = createImageUrlBuilder({ projectId: projectId || '', dataset: dat
 export const urlFor = (source: any) => {
     return builder.image(source)
 }
+
+// Custom loader for Next.js Image component to delegate optimization to Sanity
+// and prevent quality loss (defaults to quality 100)
+export const sanityLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
+    return builder
+        .image(src)
+        .width(width)
+        .auto('format')
+        .quality(quality || 100) // Max quality by default to prevent compression artifacts
+        .url()
+}

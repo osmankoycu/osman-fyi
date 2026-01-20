@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { CurationItemData } from '@/types'
-import { urlFor } from '@/lib/sanity.client'
+import { urlFor, sanityLoader } from '@/lib/sanity.client'
 
 interface CurationGridProps {
     items: CurationItemData[]
@@ -22,7 +22,8 @@ export function CurationGrid({ items }: CurationGridProps) {
                     <div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100 transition-all duration-300 group-hover:shadow-md">
                         {item.image && (
                             <Image
-                                src={urlFor(item.image).width(600).height(600).url()}
+                                loader={sanityLoader}
+                                src={item.image.asset._ref}
                                 alt={item.title}
                                 fill
                                 className="object-cover transition-transform duration-500 group-hover:scale-105"

@@ -7,17 +7,6 @@ export const projectsByTypeQuery = groq`
     slug,
     type,
     year,
-    roleLine
-  }
-`
-
-export const projectBySlugQuery = groq`
-  *[_type == "project" && slug.current == $slug][0] {
-    _id,
-    title,
-    slug,
-    type,
-    year,
     roleLine,
     rows[] {
       _key,
@@ -35,17 +24,6 @@ export const projectBySlugQuery = groq`
 
 export const photoCitiesQuery = groq`
   *[_type == "photoCity"] | order(title asc) {
-    _id,
-    title,
-    slug,
-    country,
-    subtitle,
-    "featuredImage": rows[0].items[0].image
-  }
-`
-
-export const photoCityBySlugQuery = groq`
-  *[_type == "photoCity" && slug.current == $slug][0] {
     _id,
     title,
     slug,

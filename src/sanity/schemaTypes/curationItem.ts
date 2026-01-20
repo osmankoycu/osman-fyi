@@ -24,7 +24,6 @@ export const curationItem = defineType({
             name: 'url',
             title: 'External URL',
             type: 'url',
-            validation: (rule) => rule.required(),
         }),
     ],
 })

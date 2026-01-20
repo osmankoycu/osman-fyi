@@ -5,6 +5,8 @@ import { ImageCard } from './ImageCard'
 import { TextCard } from './TextCard'
 import { clsx } from 'clsx'
 
+import { motion } from 'framer-motion'
+
 interface RowRendererProps {
     rows?: RowData[]
 }
@@ -14,16 +16,22 @@ export function RowRenderer({ rows }: RowRendererProps) {
 
     return (
         <div className="flex flex-col space-y-[20px] w-full">
-            {rows.map((row) => {
+            {rows.map((row, index) => {
                 // Validate items length before rendering to avoid index errors
                 if (row.layout === 'full' && row.items?.length !== 1) return null
                 if (row.layout === 'two' && row.items?.length !== 2) return null
 
+                const isFirstRow = index === 0
+
                 return (
-                    <section
+                    <motion.section
                         key={row._key}
                         className="w-full"
                         style={{ backgroundColor: row.backgroundColor }}
+                        initial={{ opacity: isFirstRow ? 1 : 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{ duration: 1.2, ease: "easeInOut" }}
                     >
                         {row.layout === 'full' && (
                             <div className="w-full">
@@ -46,7 +54,7 @@ export function RowRenderer({ rows }: RowRendererProps) {
                                 ))}
                             </div>
                         )}
-                    </section>
+                    </motion.section>
                 )
             })}
         </div>

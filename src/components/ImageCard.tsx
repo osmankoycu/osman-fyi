@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { urlFor, sanityLoader } from '@/lib/sanity.client'
 import { ImageCardData } from '@/types'
 import { clsx } from 'clsx'
@@ -10,12 +11,18 @@ interface ImageCardProps extends ImageCardData {
 }
 
 export function ImageCard({ image, alt, caption, className, backgroundColor }: ImageCardProps) {
+    const pathname = usePathname()
+    const isPhotography = pathname === '/photography'
+
     if (!image?.asset) return null
 
     return (
         <div className={clsx('flex flex-col space-y-3', className)}>
             <div
-                className="relative overflow-hidden rounded-[30px] bg-gray-100 w-full h-[300px] md:h-[675px]"
+                className={clsx(
+                    "relative overflow-hidden rounded-[30px] w-full h-[300px] md:h-[675px]",
+                    isPhotography ? "bg-[#1F1F1F]" : "bg-gray-100"
+                )}
                 style={{ backgroundColor }}
             >
                 <Image
@@ -23,7 +30,7 @@ export function ImageCard({ image, alt, caption, className, backgroundColor }: I
                     src={image.asset._ref}
                     alt={alt || 'Project Image'}
                     fill
-                    className="object-cover transition-transform duration-500 hover:scale-[1.01]"
+                    className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
                 />
             </div>

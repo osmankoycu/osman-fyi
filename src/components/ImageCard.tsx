@@ -20,8 +20,8 @@ export function ImageCard({ image, alt, caption, className, backgroundColor }: I
         <div className={clsx('flex flex-col space-y-3', className)}>
             <div
                 className={clsx(
-                    "relative overflow-hidden rounded-[30px] w-full h-[300px] md:h-[675px]",
-                    isPhotography ? "bg-[#1F1F1F]" : "bg-gray-100"
+                    "relative overflow-hidden rounded-[30px] w-full h-[300px]",
+                    isPhotography ? "bg-[#1F1F1F] md:h-[800px]" : "bg-gray-100 md:h-[675px]"
                 )}
                 style={{ backgroundColor }}
             >

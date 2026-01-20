@@ -34,7 +34,7 @@ export function Header() {
                     description: (
                         <>
                             I enjoy creating and experimenting with new ideas. <br />
-                            Currently working on <a href="http://image.inc" target="_blank" rel="noopener noreferrer" className="text-black border-b-2 border-black pb-0.5 hover:text-gray-600 hover:border-gray-600 transition-colors">Image Inc.</a>, based in New York.
+                            Currently working on <a href="http://image.inc" target="_blank" rel="noopener noreferrer" className="text-black border-b-2 border-black pb-0.5 hover:text-[#1F1F1F] hover:border-[#1F1F1F] transition-colors">Image Inc.</a>, based in New York.
                         </>
                     )
                 }

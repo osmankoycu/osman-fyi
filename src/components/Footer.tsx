@@ -25,7 +25,7 @@ export function Footer() {
                     onClick={scrollToTop}
                     className={clsx(
                         "p-2 rounded-full transition-colors duration-300 cursor-pointer",
-                        isDark ? "bg-white text-black hover:bg-gray-200" : "bg-black text-white hover:bg-gray-800"
+                        isDark ? "bg-white text-black hover:bg-gray-200" : "bg-black text-white hover:bg-[#1F1F1F]"
                     )}
                     aria-label="Back to top"
                 >

@@ -14,22 +14,28 @@ export default async function ExperimentsPage() {
     }
 
     return (
-        <div className="container-custom pb-24">
+        <div className="pb-24">
             <div className="flex flex-col space-y-32">
                 {experiments.length > 0 ? (
                     experiments.map((project) => (
                         <article key={project._id} className="w-full">
-                            <header className="mb-12 max-w-2xl">
-                                <h3 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                                    {project.title}
-                                </h3>
-                                <div className="flex flex-wrap gap-x-6 gap-y-2 text-base md:text-lg font-medium text-gray-500">
-                                    {project.roleLine && <span>{project.roleLine}</span>}
-                                    {project.year && <span>{project.year}</span>}
+                            {/* Project Header - Text Container (1100px) */}
+                            <header className="container-text mb-12">
+                                <div className="flex flex-col md:flex-row md:items-baseline md:justify-between mb-4">
+                                    <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
+                                        {project.title}
+                                    </h3>
+                                    <span className="text-base font-medium text-gray-500 mt-2 md:mt-0">
+                                        {project.year || '2024'}
+                                    </span>
+                                </div>
+                                <div className="text-lg font-medium text-gray-400">
+                                    {project.roleLine}
                                 </div>
                             </header>
 
-                            <div className="w-full">
+                            {/* Inline Project Rows - Image Container (1200px) */}
+                            <div className="container-custom w-full">
                                 <RowRenderer rows={project.rows} />
                             </div>
                         </article>

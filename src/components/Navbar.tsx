@@ -33,7 +33,7 @@ export function Navbar() {
 
     return (
         <nav className="w-full h-[120px] bg-white border-y border-gray-200 flex items-center mb-24">
-            <div className="container-custom flex items-center justify-between w-full">
+            <div className="container-text flex items-center justify-between w-full">
                 <div className="flex items-center space-x-1">
                     {navItems.map((item) => {
                         const isActive =

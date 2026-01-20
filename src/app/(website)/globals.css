@@ -15,7 +15,11 @@ body {
 }
 
 .container-custom {
-  @apply max-w-[1200px] mx-auto px-5 md:px-10;
+  @apply max-w-[1280px] mx-auto px-5 md:px-10;
+}
+
+.container-text {
+  @apply max-w-[1180px] mx-auto px-5 md:px-10;
 }
 
 .separator {
@@ -26,11 +30,5 @@ body {
   body {
     @apply bg-white text-black antialiased;
     font-feature-settings: "ss01", "ss02";
-  }
-}
-
-@layer utilities {
-  .container-custom {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 }

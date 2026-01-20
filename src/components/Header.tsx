@@ -2,7 +2,7 @@
 
 export function Header() {
     return (
-        <header className="container-custom pt-8 md:pt-16 mb-16 max-w-2xl">
+        <header className="container-text pt-8 md:pt-16 mb-16 max-w-none">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-8">
                 Osman Köycu, <br />
                 Independent Designer.

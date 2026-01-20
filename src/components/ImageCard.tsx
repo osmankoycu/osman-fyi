@@ -9,12 +9,15 @@ interface ImageCardProps extends ImageCardData {
     className?: string
 }
 
-export function ImageCard({ image, alt, caption, className }: ImageCardProps) {
+export function ImageCard({ image, alt, caption, className, backgroundColor }: ImageCardProps) {
     if (!image?.asset) return null
 
     return (
         <div className={clsx('flex flex-col space-y-3', className)}>
-            <div className="relative overflow-hidden rounded-[30px] bg-gray-100 w-full h-[300px] md:h-[675px]">
+            <div
+                className="relative overflow-hidden rounded-[30px] bg-gray-100 w-full h-[300px] md:h-[675px]"
+                style={{ backgroundColor }}
+            >
                 <Image
                     loader={sanityLoader}
                     src={image.asset._ref}

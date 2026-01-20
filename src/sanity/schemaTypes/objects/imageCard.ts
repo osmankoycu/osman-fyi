@@ -23,5 +23,11 @@ export const imageCard = defineType({
             title: 'Caption',
             type: 'string',
         }),
+        defineField({
+            name: 'backgroundColor',
+            title: 'Background Color',
+            type: 'string',
+            description: 'Optional hex color (e.g., #F9FAFB). Leave empty for default.',
+        }),
     ],
 })

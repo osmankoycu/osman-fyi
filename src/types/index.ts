@@ -15,6 +15,7 @@ export interface ImageCardData {
     image: SanityImage
     alt?: string
     caption?: string
+    backgroundColor?: string
 }
 
 export interface TextCardData {

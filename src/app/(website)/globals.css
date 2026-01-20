@@ -15,7 +15,7 @@ body {
 }
 
 .container-custom {
-  @apply max-w-[1280px] mx-auto px-5 md:px-10;
+  @apply max-w-[1280px] mx-auto px-[10px] md:px-10;
 }
 
 .container-text {

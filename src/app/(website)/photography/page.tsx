@@ -30,7 +30,7 @@ export default async function PhotographyPage() {
                         </header>
 
                         {/* Inline Photo Rows - Image Container (1200px) */}
-                        <div className="container-custom w-full">
+                        <div className="max-w-[1280px] mx-auto w-full px-0 md:px-10">
                             <RowRenderer rows={city.rows} />
                         </div>
                     </article>

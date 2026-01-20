@@ -47,7 +47,7 @@ export function Navbar() {
         <nav
             className={clsx(
                 'w-full sticky top-0 z-50 border-b-2 flex items-center mb-12 md:mb-24 transition-[height] duration-300',
-                isStuck ? 'h-[100px]' : 'h-[130px]',
+                isStuck ? 'h-[64px] md:h-[100px]' : 'h-[80px] md:h-[130px]',
                 isDark ? 'bg-black border-[#1F1F1F]' : 'bg-white border-gray-200'
             )}
         >
@@ -65,7 +65,7 @@ export function Navbar() {
                                 key={item.href}
                                 href={item.href}
                                 className={clsx(
-                                    'px-3 py-2 md:px-5 md:py-2.5 rounded-full transition-all duration-200 text-[16px] md:text-[22px] font-bold whitespace-nowrap',
+                                    'px-3 py-1.5 md:px-5 md:py-2.5 rounded-full transition-all duration-200 text-[18px] md:text-[22px] font-bold whitespace-nowrap',
                                     isActive
                                         ? (isDark ? 'bg-white text-black' : 'bg-black text-white')
                                         : (isDark ? 'text-white hover:bg-[#1F1F1F]' : 'text-black hover:bg-gray-100')
@@ -80,7 +80,7 @@ export function Navbar() {
                     <a
                         href="mailto:osmankoycu@gmail.com"
                         className={clsx(
-                            "md:hidden shrink-0 ml-1 px-3 py-2 cursor-pointer transition-colors duration-300 hover:text-[#1F1F1F]",
+                            "md:hidden shrink-0 ml-1 px-3 py-1.5 cursor-pointer transition-colors duration-300 hover:text-[#1F1F1F]",
                             isDark ? "text-white" : "text-black"
                         )}
                         aria-label="Send email"

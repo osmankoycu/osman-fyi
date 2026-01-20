@@ -15,7 +15,7 @@ export function RowRenderer({ rows }: RowRendererProps) {
     if (!rows || rows.length === 0) return null
 
     return (
-        <div className="flex flex-col space-y-[10px] md:space-y-[20px] w-full">
+        <div className="flex flex-col space-y-[10px] md:space-y-[20px] w-full px-[10px] md:px-0">
             {rows.map((row, index) => {
                 // Validate items length before rendering to avoid index errors
                 if (row.layout === 'full' && row.items?.length !== 1) return null

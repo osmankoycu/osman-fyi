@@ -31,7 +31,7 @@ export function CurationGrid({ items }: CurationGridProps) {
                             />
                         )}
                     </div>
-                    <h3 className="text-[22px] font-semibold text-black group-hover:text-gray-600 transition-colors text-center">
+                    <h3 className="text-[16px] font-semibold text-black text-center">
                         {item.title}
                     </h3>
                 </a>

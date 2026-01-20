@@ -10,7 +10,7 @@ export function Footer() {
             <div className="separator mb-10" />
             <div className="container-text flex items-center justify-between">
                 <div className="text-[22px] font-bold text-black">
-                    Osman Köycu, Copyright © 2026
+                    Osman Köycü, Copyright © 2026
                 </div>
                 <button
                     onClick={scrollToTop}

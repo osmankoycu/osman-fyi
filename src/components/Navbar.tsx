@@ -1,38 +1,53 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 
 export function Navbar() {
     const pathname = usePathname()
+    const [isStuck, setIsStuck] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScroll = window.scrollY
+
+            // Use functional state update to access the latest state value
+            setIsStuck((prevIsStuck) => {
+                // Shrink if scrolling down past 750px
+                if (!prevIsStuck && currentScroll > 750) {
+                    return true
+                }
+                // Expand if scrolling up past 700px
+                if (prevIsStuck && currentScroll < 700) {
+                    return false
+                }
+                // Otherwise keep current state
+                return prevIsStuck
+            })
+        }
+
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
 
     const navItems = [
         { label: 'Product', href: '/' },
         { label: 'Experiments', href: '/experiments' },
         { label: 'Photography', href: '/photography' },
         { label: 'Curation', href: '/curation' },
-        { label: 'About', href: '/about' },
+        { label: isStuck ? 'Osman Köycü' : 'About', href: '/about' },
     ]
 
-    const SendIcon = () => (
-        <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <line x1="22" y1="2" x2="11" y2="13" />
-            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-        </svg>
-    )
-
     return (
-        <nav className="w-full h-[120px] bg-white border-y border-gray-200 flex items-center mb-24">
+        <nav
+            className={clsx(
+                'w-full sticky top-0 z-50 bg-white border-b border-gray-200 flex items-center mb-24 transition-all duration-300',
+                isStuck ? 'h-[100px]' : 'h-[130px]'
+            )}
+        >
             <div className="container-text flex items-center justify-between w-full">
                 <div className="flex items-center space-x-1">
                     {navItems.map((item) => {
@@ -58,9 +73,18 @@ export function Navbar() {
                     })}
                 </div>
 
-                <div className="text-black cursor-pointer hover:scale-110 transition-transform">
-                    <SendIcon />
-                </div>
+                <a
+                    href="mailto:osmankoycu@gmail.com"
+                    className="text-black cursor-pointer transition-opacity hover:opacity-70"
+                    aria-label="Send email"
+                >
+                    <Image
+                        src="/mail-icon.svg"
+                        width={32}
+                        height={32}
+                        alt="Contact"
+                    />
+                </a>
             </div>
         </nav>
     )

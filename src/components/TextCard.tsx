@@ -14,7 +14,7 @@ export function TextCard({ text, className }: TextCardProps) {
     return (
         <div className={clsx(
             'flex flex-col justify-center p-8 md:p-12 bg-gray-50 rounded-[30px] h-full min-h-[300px] md:h-[675px]',
-            'prose prose-lg prose-neutral max-w-none text-black/80',
+            'text-[40px] font-semibold leading-[50px] text-black',
             className
         )}>
             <PortableText value={text} />

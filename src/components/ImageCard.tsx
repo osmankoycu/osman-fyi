@@ -25,7 +25,7 @@ export function ImageCard({ image, alt, caption, className }: ImageCardProps) {
                 />
             </div>
             {caption && (
-                <p className="text-sm text-gray-500 font-medium leading-relaxed px-1">
+                <p className="text-[22px] font-semibold text-[#9C9C9C] leading-relaxed px-1">
                     {caption}
                 </p>
             )}

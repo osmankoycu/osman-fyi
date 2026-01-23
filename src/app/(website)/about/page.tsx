@@ -10,7 +10,7 @@ export default async function AboutPage() {
     const data: AboutPageData = await client.fetch(aboutPageQuery)
 
     return (
-        <div className="pt-8 md:pt-16 pb-24">
+        <div className="pb-24">
             {/* Hero Image - Wider Container */}
             <div className="container-custom mb-16">
                 <AboutHero

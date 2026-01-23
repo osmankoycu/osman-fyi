@@ -14,7 +14,7 @@ export default async function CurationPage() {
     }
 
     return (
-        <div className="container-custom pt-8 md:pt-16 pb-24">
+        <div className="container-custom pb-24">
 
             {
                 items.length > 0 ? (

@@ -20,10 +20,10 @@ export function CurationGrid({ items }: CurationGridProps) {
                     className="group flex flex-col space-y-3"
                 >
                     <div className="relative aspect-square overflow-hidden rounded-[4px] bg-gray-100 transition-all duration-300">
-                        {item.image && (
+                        {item.image && (item.image.asset._ref || item.image.asset._id) && (
                             <Image
                                 loader={sanityLoader}
-                                src={item.image.asset._ref}
+                                src={item.image.asset._ref || item.image.asset._id || ''}
                                 alt={item.title}
                                 fill
                                 className="object-cover transition-transform duration-500 group-hover:scale-105"

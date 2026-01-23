@@ -14,7 +14,15 @@ export const projectsByTypeQuery = groq`
       backgroundColor,
       items[] {
         _type,
-        image,
+        image {
+            ...,
+            asset->{
+                ...,
+                metadata {
+                    dimensions
+                }
+            }
+        },
         alt,
         caption,
         text,
@@ -38,7 +46,15 @@ export const photoCitiesQuery = groq`
       backgroundColor,
       items[] {
         _type,
-        image,
+        image {
+            ...,
+            asset->{
+                ...,
+                metadata {
+                    dimensions
+                }
+            }
+        },
         alt,
         caption,
         backgroundColor,

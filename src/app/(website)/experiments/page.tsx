@@ -22,18 +22,18 @@ export default async function ExperimentsPage() {
                             {/* Project Header - Text Container (1100px) */}
                             <header className="container-text mb-12">
                                 <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-0">
-                                    <h3 className="text-[18px] md:text-[22px] font-bold text-black">
+                                    <h3 className="text-[18px] md:text-[20px] lg:text-[22px] font-bold text-black">
                                         {project.title}
                                     </h3>
                                 </div>
-                                <div className="flex justify-between items-end text-[18px] md:text-[22px] font-semibold text-[#9C9C9C]">
+                                <div className="flex justify-between items-end text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-[#9C9C9C]">
                                     <span>{project.roleLine}</span>
                                     <span className="text-black">{project.year || '2024'}</span>
                                 </div>
                             </header>
 
                             {/* Inline Project Rows - Image Container (1200px) */}
-                            <div className="max-w-[1280px] mx-auto w-full px-0 md:px-10">
+                            <div className="max-w-[1280px] mx-auto w-full px-0 md:px-5 lg:px-10">
                                 <RowRenderer rows={project.rows} />
                             </div>
                         </article>

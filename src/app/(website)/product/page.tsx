@@ -19,7 +19,7 @@ export default async function ProductPage() {
                 {products.length > 0 ? (
                     products.map((project) => (
                         <article key={project._id} className="w-full">
-                            <header className="mb-12 max-w-[1280px] mx-auto px-5 md:px-10">
+                            <header className="mb-12 max-w-[1280px] mx-auto px-5 md:px-[30px] lg:px-10">
                                 <div className="max-w-2xl">
                                     <h3 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                                         {project.title}
@@ -31,7 +31,7 @@ export default async function ProductPage() {
                                 </div>
                             </header>
 
-                            <div className="max-w-[1280px] mx-auto w-full px-0 md:px-10">
+                            <div className="max-w-[1280px] mx-auto w-full px-0 md:px-5 lg:px-10">
                                 <RowRenderer rows={project.rows} />
                             </div>
                         </article>

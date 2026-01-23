@@ -3,8 +3,16 @@ import { PortableTextBlock } from 'sanity'
 export interface SanityImage {
     _type: 'image'
     asset: {
-        _ref: string
-        _type: 'reference'
+        _ref?: string
+        _id?: string
+        _type: 'reference' | 'sanity.imageAsset'
+        metadata?: {
+            dimensions: {
+                width: number
+                height: number
+                aspectRatio: number
+            }
+        }
     }
     hotspot?: any
     crop?: any

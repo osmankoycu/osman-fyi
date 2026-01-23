@@ -65,7 +65,7 @@ export function Navbar() {
                                 key={item.href}
                                 href={item.href}
                                 className={clsx(
-                                    'px-3 py-1.5 md:px-5 md:py-2.5 rounded-full transition-all duration-200 text-[18px] md:text-[22px] font-bold whitespace-nowrap',
+                                    'px-3 py-1.5 md:px-5 md:py-2.5 rounded-full transition-all duration-200 text-[18px] md:text-[20px] lg:text-[22px] font-bold whitespace-nowrap',
                                     isActive
                                         ? (isDark ? 'bg-white text-black' : 'bg-black text-white')
                                         : (isDark ? 'text-white hover:bg-[#1F1F1F]' : 'text-black hover:bg-gray-100')

@@ -16,7 +16,7 @@ export function Footer() {
             <div className={clsx("separator mb-10", isDark ? "!bg-[#1F1F1F]" : "bg-gray-200")} />
             <div className="container-text flex flex-col md:flex-row items-center md:justify-between gap-6 md:gap-0">
                 <div className={clsx(
-                    "text-[16px] md:text-[22px] font-bold",
+                    "text-[16px] md:text-[19px] lg:text-[22px] font-bold",
                     isDark ? "text-white" : "text-black"
                 )}>
                     Osman Köycü, Copyright © 2026

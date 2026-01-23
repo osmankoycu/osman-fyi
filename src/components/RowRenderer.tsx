@@ -37,7 +37,7 @@ export function RowRenderer({ rows }: RowRendererProps) {
                             <div className="w-full">
                                 {row.items.map((item, idx) => (
                                     <div key={idx}>
-                                        {item._type === 'imageCard' && <ImageCard {...item} />}
+                                        {item._type === 'imageCard' && <ImageCard {...item} layout={row.layout} />}
                                         {item._type === 'textCard' && <TextCard {...item} />}
                                     </div>
                                 ))}
@@ -45,11 +45,11 @@ export function RowRenderer({ rows }: RowRendererProps) {
                         )}
 
                         {row.layout === 'two' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-[2px] items-start">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-[2px] items-stretch">
                                 {row.items.map((item, idx) => (
-                                    <div key={idx} className="w-full">
-                                        {item._type === 'imageCard' && <ImageCard {...item} mobileHeightClass="h-[500px]" />}
-                                        {item._type === 'textCard' && <TextCard {...item} className="min-h-[500px]" />}
+                                    <div key={idx} className="w-full h-full">
+                                        {item._type === 'imageCard' && <ImageCard {...item} layout={row.layout} />}
+                                        {item._type === 'textCard' && <TextCard {...item} className="h-full" />}
                                     </div>
                                 ))}
                             </div>

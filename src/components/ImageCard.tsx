@@ -21,7 +21,7 @@ export function ImageCard({ image, alt, caption, className, backgroundColor, mob
         <div className={clsx('flex flex-col space-y-3', className)}>
             <div
                 className={clsx(
-                    "relative overflow-hidden rounded-[20px] md:rounded-[30px] w-full",
+                    "relative overflow-hidden rounded-[4px] w-full",
                     mobileHeightClass || "h-[300px]",
                     isPhotography ? "bg-[#1F1F1F] md:h-[800px]" : "bg-gray-100 md:h-[675px]"
                 )}

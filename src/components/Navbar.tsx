@@ -5,10 +5,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
+import { usePlaneAnimation } from '../hooks/usePlaneAnimation'
 
 export function Navbar() {
     const pathname = usePathname()
     const [isStuck, setIsStuck] = useState(false)
+    usePlaneAnimation(isStuck)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -98,8 +100,9 @@ export function Navbar() {
                     </a>
                 </div>
 
-                {/* Desktop Only Email Icon */}
+
                 <a
+                    id="emailPlane"
                     href="mailto:osmankoycu@gmail.com"
                     className={clsx(
                         "hidden md:block cursor-pointer transition-colors duration-300 hover:text-[#1F1F1F]",

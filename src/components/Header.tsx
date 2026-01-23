@@ -51,7 +51,7 @@ export function Header() {
                 "text-[32px] leading-[1.1] md:text-[42px] md:leading-[1.15] lg:text-[52px] lg:leading-[62px] font-bold mb-6 md:mb-8",
                 isDark ? "text-white" : "text-black"
             )}>
-                Osman Köycü, <br />
+                <span id="nameAnchor">Osman Köycü</span>, <br />
                 {content.title}
             </h1>
             <div className={clsx(

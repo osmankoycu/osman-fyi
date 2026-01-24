@@ -30,7 +30,7 @@ export function ImageCard({ image, alt, caption, className, backgroundColor, mob
         <div className={clsx('flex flex-col space-y-3', className)}>
             <div
                 className={clsx(
-                    "relative overflow-hidden rounded-[4px] w-full",
+                    "relative overflow-hidden rounded-2xl w-full",
                     layout === 'two' && !isPhotography && "min-h-[400px] max-h-[450px] md:min-h-0 md:max-h-none",
                     isPhotography ? "bg-[#1F1F1F]" : "bg-gray-100"
                 )}

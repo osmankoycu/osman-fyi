@@ -28,7 +28,7 @@ export function TextCard({ text, className, backgroundColor, textColor }: TextCa
     return (
         <div
             className={clsx(
-                'flex flex-col justify-center p-8 md:p-10 lg:p-12 bg-gray-50 rounded-[4px] w-full h-full min-h-0 max-h-[450px] md:max-h-full overflow-y-auto no-scrollbar',
+                'flex flex-col justify-center p-8 md:p-10 lg:p-12 bg-gray-50 rounded-2xl w-full h-full min-h-0 max-h-[450px] md:max-h-full overflow-y-auto no-scrollbar',
                 isLongText
                     ? 'text-[clamp(24px,2.9vw,40px)]'
                     : 'text-[clamp(24px,3.15vw,40px)]',

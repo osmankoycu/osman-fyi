@@ -19,7 +19,7 @@ body {
 }
 
 .container-text {
-  @apply max-w-[1180px] mx-auto px-5 md:px-[30px] lg:px-10;
+  @apply max-w-[1280px] mx-auto px-[10px] md:px-5 lg:px-10;
 }
 
 .separator {

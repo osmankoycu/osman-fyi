@@ -48,9 +48,9 @@ export function Navbar() {
     return (
         <nav
             className={clsx(
-                'w-full sticky top-0 z-50 border-b-2 flex items-center mb-12 md:mb-24 transition-[height] duration-300',
+                'w-full sticky top-0 z-50 border-b-2 flex items-center mb-12 md:mb-24 transition-[height] duration-300 backdrop-blur-md',
                 isStuck ? 'h-[64px] md:h-[100px]' : 'h-[80px] md:h-[130px]',
-                isDark ? 'bg-black border-[#1F1F1F]' : 'bg-white border-gray-200'
+                isDark ? 'bg-black/80 border-[#1F1F1F]' : 'bg-white/80 border-gray-200'
             )}
         >
             <div className="container-text flex items-center justify-between w-full">

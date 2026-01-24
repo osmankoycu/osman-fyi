@@ -20,7 +20,7 @@ export default async function PhotographyPage() {
                     <article key={city._id} className="w-full">
                         {/* City Header - Text Container (1100px) */}
                         {/* City Header - Aligned with Content Container */}
-                        <header className="max-w-[1280px] mx-auto w-full px-[10px] md:px-5 lg:px-10 mb-3 md:mb-4">
+                        <header className="max-w-[1280px] mx-auto w-full px-[10px] md:px-5 lg:px-10 mb-3 md:mb-5">
                             <div className="grid grid-cols-1 md:grid-cols-12 items-end gap-1 md:gap-0">
                                 {/* Left: Title */}
                                 <h3 className="text-[18px] font-semibold text-white order-1 md:col-span-3">

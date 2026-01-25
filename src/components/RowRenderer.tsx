@@ -12,13 +12,14 @@ import { motion } from 'framer-motion'
 
 interface RowRendererProps {
     rows?: RowData[]
+    aspectRatio?: 'video' | '3/2'
 }
 
 // ...
-export function RowRenderer({ rows }: RowRendererProps) {
+export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
     const [isWide, setIsWide] = useState(false)
     const pathname = usePathname()
-    const isPhotography = pathname === '/photography'
+    const is3By2 = aspectRatio === '3/2'
 
     useEffect(() => {
         const checkWidth = () => {
@@ -79,8 +80,8 @@ export function RowRenderer({ rows }: RowRendererProps) {
         return packed
     }, [rows, isWide])
 
-    const aspectClass = isPhotography ? 'aspect-[3/2]' : 'aspect-video'
-    const wideTotalRatio = isPhotography ? '2.25' : '2.66'
+    const aspectClass = is3By2 ? 'aspect-[3/2]' : 'aspect-video'
+    const wideTotalRatio = is3By2 ? '2.25' : '2.66'
 
     return (
         <div className="flex flex-col space-y-[2px] w-full px-[10px] md:px-0">
@@ -150,22 +151,44 @@ export function RowRenderer({ rows }: RowRendererProps) {
                         )}
 
                         {standardRow.layout === 'two' && (
-                            <div
-                                className={clsx("grid grid-cols-1 md:grid-cols-2 gap-[2px] items-stretch", isPhotography ? "md:aspect-[3/2]" : "md:aspect-video")}
-                                style={{ aspectRatio: isWide ? wideTotalRatio : undefined }}
-                            >
-                                {standardRow.items.map((item, idx) => (
-                                    <div key={idx} className="w-full aspect-square md:aspect-auto md:h-full relative">
-                                        {/* Aspect ratio control might be needed here or handled by ItemRenderer content */}
-                                        <ItemRenderer
-                                            item={item}
-                                            className="w-full h-full object-cover absolute inset-0"
-                                            fillContainer
-                                            objectFit={isWide ? 'contain' : undefined}
-                                        />
+                            // Check if both items are visual (non-text) to enable side-by-side on mobile
+                            (() => {
+                                const isDoubleVisual = standardRow.items.every(item => item._type === 'imageCard' || item._type === 'videoCard')
+
+                                return (
+                                    <div
+                                        className={clsx(
+                                            "grid gap-[2px] items-stretch",
+                                            isDoubleVisual ? "grid-cols-2" : "grid-cols-1",
+                                            "md:grid-cols-2",
+                                            // Apply aspect ratio on mobile only if it's double visual, otherwise keep md: prefix
+                                            isDoubleVisual
+                                                ? (is3By2 ? "aspect-[3/2]" : "aspect-video")
+                                                : (is3By2 ? "md:aspect-[3/2]" : "md:aspect-video")
+                                        )}
+                                        style={{ aspectRatio: isWide ? wideTotalRatio : undefined }}
+                                    >
+                                        {standardRow.items.map((item, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={clsx(
+                                                    "w-full relative md:aspect-auto md:h-full",
+                                                    // If double visual, let it fill height (controlled by parent aspect ratio), otherwise square on mobile
+                                                    isDoubleVisual ? "h-full" : "aspect-square"
+                                                )}
+                                            >
+                                                {/* Aspect ratio control might be needed here or handled by ItemRenderer content */}
+                                                <ItemRenderer
+                                                    item={item}
+                                                    className="w-full h-full object-cover absolute inset-0"
+                                                    fillContainer
+                                                    objectFit={isWide ? 'contain' : undefined}
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
+                                )
+                            })()
                         )}
                     </motion.section>
                 )

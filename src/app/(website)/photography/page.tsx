@@ -21,9 +21,20 @@ export default async function PhotographyPage() {
                         {/* City Header - Text Container (1100px) */}
                         {/* City Header - Aligned with Content Container */}
                         <header className="max-w-[1920px] mx-auto w-full px-[10px] md:px-5 lg:px-10 mb-[26px] md:mb-[14px]">
-                            <div className="grid grid-cols-1 md:grid-cols-12 items-end gap-0">
+                            {/* Mobile Header Layout */}
+                            <div className="md:hidden flex flex-col items-center gap-1">
+                                <div className="text-[20px] font-bold text-white text-center">
+                                    {city.title}, {city.country}
+                                </div>
+                                <div className="text-[16px] font-semibold text-[#9C9C9C] text-center">
+                                    {city.subtitle}
+                                </div>
+                            </div>
+
+                            {/* Desktop Header Layout */}
+                            <div className="hidden md:grid md:grid-cols-12 items-end gap-0">
                                 {/* Left: Title */}
-                                <h3 className="text-[16px] lg:text-[18px] font-semibold text-white text-center md:text-left order-1 md:col-span-3">
+                                <h3 className="text-[16px] lg:text-[18px] font-bold text-white text-left order-1 md:col-span-3">
                                     {city.title}
                                 </h3>
 
@@ -33,7 +44,7 @@ export default async function PhotographyPage() {
                                 </div>
 
                                 {/* Right: Country */}
-                                <div className="text-center md:text-right text-white text-[16px] lg:text-[18px] font-semibold order-3 md:col-span-3">
+                                <div className="text-right text-white text-[16px] lg:text-[18px] font-bold order-3 md:col-span-3">
                                     {city.country}
                                 </div>
                             </div>
@@ -41,7 +52,7 @@ export default async function PhotographyPage() {
 
                         {/* Inline Photo Rows - Image Container (1200px) */}
                         <div className="max-w-[1920px] mx-auto w-full px-0 md:px-5 lg:px-10">
-                            <RowRenderer rows={city.rows} />
+                            <RowRenderer rows={city.rows} aspectRatio="3/2" />
                         </div>
                     </article>
                 ))

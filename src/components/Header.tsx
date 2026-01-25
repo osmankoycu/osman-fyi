@@ -45,7 +45,7 @@ export function Header() {
     const isDark = pathname === '/photography'
 
     return (
-        <header className="container-text h-[400px] mb-12 flex flex-col justify-center items-center text-center">
+        <header className="container-text h-[calc(100dvh-200px)] mb-12 flex flex-col justify-center items-center text-center">
             <h1 className={clsx(
                 "text-[32px] leading-[42px] mb-6 md:mb-8 max-w-[900px]",
                 isDark ? "text-white" : "text-black"

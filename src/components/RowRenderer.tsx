@@ -5,6 +5,7 @@ import { ImageCard } from './ImageCard'
 import { TextCard } from './TextCard'
 import { clsx } from 'clsx'
 import React, { useState, useEffect, useMemo } from 'react'
+import { usePathname } from 'next/navigation'
 
 import { motion } from 'framer-motion'
 
@@ -15,6 +16,8 @@ interface RowRendererProps {
 // ...
 export function RowRenderer({ rows }: RowRendererProps) {
     const [isWide, setIsWide] = useState(false)
+    const pathname = usePathname()
+    const isPhotography = pathname === '/photography'
 
     useEffect(() => {
         const checkWidth = () => {
@@ -75,6 +78,9 @@ export function RowRenderer({ rows }: RowRendererProps) {
         return packed
     }, [rows, isWide])
 
+    const aspectClass = isPhotography ? 'aspect-[3/2]' : 'aspect-video'
+    const wideTotalRatio = isPhotography ? '2.25' : '2.66'
+
     return (
         <div className="flex flex-col space-y-[2px] w-full px-[10px] md:px-0">
             {displayedRows.map((row) => {
@@ -90,10 +96,10 @@ export function RowRenderer({ rows }: RowRendererProps) {
                                 transition={{ duration: 1.2, ease: "easeInOut" }}
                                 className="grid grid-cols-1 min-[1440px]:grid-cols-[2fr_1fr] gap-[2px] w-full"
                             >
-                                <div className="w-full relative aspect-video">
+                                <div className={clsx("w-full relative", aspectClass)}>
                                     <ItemRenderer item={row.rowA.primary} className="absolute inset-0 w-full h-full" fillContainer />
                                 </div>
-                                <div className="w-full relative min-[1440px]:aspect-auto aspect-video">
+                                <div className={clsx("w-full relative min-[1440px]:aspect-auto", aspectClass)}>
                                     {/* Double item matches height of sibling in grid, but needs object-cover */}
                                     <ItemRenderer item={row.rowA.secondary} className="absolute inset-0 w-full h-full" fillContainer />
                                 </div>
@@ -107,10 +113,10 @@ export function RowRenderer({ rows }: RowRendererProps) {
                                 transition={{ duration: 1.2, ease: "easeInOut" }}
                                 className="grid grid-cols-1 min-[1440px]:grid-cols-[1fr_2fr] gap-[2px] w-full"
                             >
-                                <div className="w-full relative min-[1440px]:aspect-auto aspect-video">
+                                <div className={clsx("w-full relative min-[1440px]:aspect-auto", aspectClass)}>
                                     <ItemRenderer item={row.rowB.primary} className="absolute inset-0 w-full h-full" fillContainer />
                                 </div>
-                                <div className="w-full relative aspect-video">
+                                <div className={clsx("w-full relative", aspectClass)}>
                                     <ItemRenderer item={row.rowB.secondary} className="absolute inset-0 w-full h-full" fillContainer />
                                 </div>
                             </motion.div>
@@ -135,15 +141,15 @@ export function RowRenderer({ rows }: RowRendererProps) {
                         transition={{ duration: 1.2, ease: "easeInOut" }}
                     >
                         {standardRow.layout === 'full' && (
-                            <div className="w-full aspect-video relative">
+                            <div className={clsx("w-full relative", aspectClass)}>
                                 <ItemRenderer item={standardRow.items[0]} className="absolute inset-0 w-full h-full" />
                             </div>
                         )}
 
                         {standardRow.layout === 'two' && (
                             <div
-                                className="grid grid-cols-1 md:grid-cols-2 gap-[2px] items-stretch md:aspect-video"
-                                style={{ aspectRatio: isWide ? '2.66' : undefined }}
+                                className={clsx("grid grid-cols-1 md:grid-cols-2 gap-[2px] items-stretch", isPhotography ? "md:aspect-[3/2]" : "md:aspect-video")}
+                                style={{ aspectRatio: isWide ? wideTotalRatio : undefined }}
                             >
                                 {standardRow.items.map((item, idx) => (
                                     <div key={idx} className="w-full aspect-square md:aspect-auto md:h-full relative">

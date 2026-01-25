@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
+import { motion, AnimatePresence } from 'framer-motion'
 import { usePlaneAnimation } from '../hooks/usePlaneAnimation'
 
 export function Navbar() {
@@ -43,19 +44,29 @@ export function Navbar() {
         { label: isStuck ? 'Osman Köycü' : 'About', href: '/about' },
     ]
 
-    const isDark = pathname === '/photography'
+    const isLight = pathname !== '/photography'
+    const isDark = !isLight
 
     return (
         <nav
             className={clsx(
-                'w-full sticky top-0 z-50 border-b-2 flex items-center mb-12 md:mb-24 transition-[height] duration-300 backdrop-blur-md',
-                isStuck ? 'h-[64px] md:h-[100px]' : 'h-[80px] md:h-[130px]',
-                isDark ? 'bg-black/80 border-[#1F1F1F]' : 'bg-white/80 border-gray-200'
+                'w-full sticky top-0 z-50 flex items-center transition-[height] duration-300 h-[60px] md:h-[80px]',
+                isLight ? 'bg-white' : 'bg-black'
             )}
         >
-            <div className="container-text flex items-center justify-between w-full">
-                {/* Scrollable Nav Items Container */}
-                <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar -mx-5 px-5 md:mx-0 md:px-0 mask-image-scroll">
+            <div className="container-text flex items-center justify-between w-full h-full">
+                {/* Desktop Layout - Equal Spacing between all items */}
+                <div className="hidden md:flex w-full items-center justify-between gap-4">
+                    {/* Circle Logo */}
+                    <div
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="flex-[0.5] flex justify-start items-center shrink-0"
+                    >
+                        <div className={clsx("cursor-pointer w-6 h-6 rounded-full shrink-0 border-[5px] bg-transparent flex items-center justify-center", isLight ? "border-black" : "border-white")}>
+                            <div className={clsx("w-2 h-2 rounded-full", isLight ? "bg-black" : "bg-white")} />
+                        </div>
+                    </div>
+
                     {navItems.map((item) => {
                         const isActive =
                             item.href === '/'
@@ -63,64 +74,144 @@ export function Navbar() {
                                 : pathname.startsWith(item.href)
 
                         return (
-                            <Link
+                            <div
                                 key={item.href}
-                                href={item.href}
-                                className={clsx(
-                                    'px-3 py-1.5 md:px-5 md:py-2.5 rounded-full transition-all duration-200 text-[18px] md:text-[20px] lg:text-[22px] font-bold whitespace-nowrap',
-                                    isActive
-                                        ? (isDark ? 'bg-white text-black' : 'bg-black text-white')
-                                        : (isDark ? 'text-white hover:bg-[#1F1F1F]' : 'text-black hover:bg-gray-100')
-                                )}
+                                className="flex-1 flex justify-center"
                             >
-                                {item.label}
-                            </Link>
+                                <Link
+                                    href={item.href}
+                                    className={clsx(
+                                        'text-center text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative min-w-[80px]',
+                                        isActive
+                                            ? (isLight ? 'text-black font-bold' : 'text-white font-bold')
+                                            : (isLight ? 'text-black/40 hover:text-black font-semibold' : 'text-[#9c9c9c] hover:text-white font-semibold')
+                                    )}
+                                >
+                                    {item.href === '/about' ? (
+                                        <div className="relative flex justify-center items-center h-full">
+                                            <AnimatePresence mode="wait" initial={false}>
+                                                <motion.span
+                                                    key={item.label}
+                                                    initial={{ y: 10, opacity: 0 }}
+                                                    animate={{ y: 0, opacity: 1 }}
+                                                    exit={{ y: -10, opacity: 0 }}
+                                                    transition={{ duration: 0.2, ease: "easeOut" }}
+                                                    className="block"
+                                                >
+                                                    {item.label}
+                                                </motion.span>
+                                            </AnimatePresence>
+                                        </div>
+                                    ) : (
+                                        item.label
+                                    )}
+                                </Link>
+                            </div>
                         )
                     })}
 
-                    {/* Mobile Only Email Icon */}
-                    <a
-                        href="mailto:osmankoycu@gmail.com"
-                        className={clsx(
-                            "md:hidden shrink-0 ml-1 px-3 py-1.5 cursor-pointer transition-colors duration-300 hover:text-[#1F1F1F]",
-                            isDark ? "text-white" : "text-black"
-                        )}
-                        aria-label="Send email"
+                    {/* Email Icon as part of the list */}
+                    <div
+                        className="flex-[0.5] flex justify-end items-center shrink-0"
                     >
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 32 32"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="fill-current"
+                        <a
+                            id="emailPlane"
+                            href="mailto:osmankoycu@gmail.com"
+                            className={clsx(
+                                "shrink-0 cursor-pointer transition-colors duration-300",
+                                isLight ? "text-black hover:text-[#4a4a4a]" : "text-white hover:text-[#9c9c9c]"
+                            )}
+                            aria-label="Send email"
                         >
-                            <path d="M18.9466 32C18.1425 32 17.5165 31.7455 17.0687 31.2366C16.631 30.7277 16.285 30.0814 16.0305 29.2977L14.1069 23.2061C13.9033 22.5751 13.8372 21.9746 13.9084 21.4046C13.9796 20.8244 14.2341 20.2901 14.6718 19.8015L30.0153 2.76336C30.1272 2.64122 30.1781 2.50382 30.1679 2.35115C30.1679 2.19847 30.1221 2.07125 30.0305 1.96947C29.9389 1.86768 29.8168 1.81679 29.6641 1.81679C29.5115 1.81679 29.369 1.87277 29.2366 1.98473L12.1374 17.3282C11.5878 17.8168 11.0585 18.0814 10.5496 18.1221C10.0407 18.1628 9.4402 18.0712 8.74809 17.8473L2.67176 15.9389C1.88804 15.6947 1.24682 15.3537 0.748092 14.916C0.249364 14.4784 0 13.8575 0 13.0534C0 12.341 0.21374 11.7455 0.641221 11.2672C1.07888 10.7888 1.64885 10.4122 2.35115 10.1374L28.1374 0.305344C28.402 0.203562 28.6616 0.127226 28.916 0.0763359C29.1705 0.0254453 29.4148 0 29.6489 0C30.3613 0 30.9313 0.21374 31.3588 0.641221C31.7863 1.0687 32 1.63868 32 2.35115C32 2.57506 31.9746 2.81425 31.9237 3.0687C31.8728 3.32316 31.7964 3.58779 31.6947 3.8626L21.8626 29.6489C21.5878 30.3511 21.2112 30.916 20.7328 31.3435C20.2545 31.7812 19.659 32 18.9466 32Z" />
-                        </svg>
-                    </a>
+                            <svg
+                                width="26"
+                                height="21"
+                                viewBox="0 0 26 21"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="fill-current"
+                            >
+                                <path d="M5.9834 8.08887H11.3867C11.6374 8.08887 11.8522 7.99219 12.0312 7.79883C12.2103 7.60547 12.2998 7.39062 12.2998 7.1543C12.2998 6.88932 12.2103 6.66732 12.0312 6.48828C11.8594 6.30208 11.6445 6.20898 11.3867 6.20898H5.9834C5.72559 6.20898 5.51074 6.30208 5.33887 6.48828C5.16699 6.67448 5.08105 6.89648 5.08105 7.1543C5.08105 7.39062 5.16699 7.60547 5.33887 7.79883C5.5179 7.99219 5.73275 8.08887 5.9834 8.08887ZM5.9834 10.8926H9.77539C10.026 10.8926 10.2409 10.8031 10.4199 10.624C10.599 10.4378 10.6885 10.2194 10.6885 9.96875C10.6885 9.71094 10.599 9.48893 10.4199 9.30273C10.248 9.11654 10.0332 9.02344 9.77539 9.02344H5.9834C5.72559 9.02344 5.51074 9.11654 5.33887 9.30273C5.16699 9.48893 5.08105 9.71094 5.08105 9.96875C5.08105 10.2194 5.16699 10.4378 5.33887 10.624C5.5179 10.8031 5.73275 10.8926 5.9834 10.8926ZM18.0684 10.9893C18.5625 10.9893 19.0065 10.8711 19.4004 10.6348C19.8014 10.3913 20.1201 10.069 20.3564 9.66797C20.5999 9.26693 20.7217 8.81934 20.7217 8.3252C20.7217 7.83105 20.5999 7.38346 20.3564 6.98242C20.1201 6.57422 19.8014 6.25195 19.4004 6.01562C19.0065 5.7793 18.5625 5.66113 18.0684 5.66113C17.5814 5.66113 17.1338 5.7793 16.7256 6.01562C16.3245 6.25195 16.0059 6.57422 15.7695 6.98242C15.5332 7.38346 15.415 7.83105 15.415 8.3252C15.415 8.81934 15.5332 9.26693 15.7695 9.66797C16.0059 10.069 16.3245 10.3913 16.7256 10.6348C17.1338 10.8711 17.5814 10.9893 18.0684 10.9893ZM4.01758 20.9473C2.73568 20.9473 1.74382 20.5964 1.04199 19.8945C0.347331 19.1999 0 18.2188 0 16.9512V4.00684C0 2.72493 0.347331 1.73665 1.04199 1.04199C1.74382 0.347331 2.73568 0 4.01758 0H21.7959C23.0706 0 24.0553 0.350911 24.75 1.05273C25.4518 1.7474 25.8027 2.7321 25.8027 4.00684V16.9512C25.8027 18.2188 25.4518 19.1999 24.75 19.8945C24.0553 20.5964 23.0706 20.9473 21.7959 20.9473H4.01758Z" fill="currentColor" />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
 
+                {/* Mobile Layout (Scrollable with all items) */}
+                <div className="md:hidden flex items-center w-full h-full">
+                    <div className="flex items-center justify-between w-full overflow-x-auto no-scrollbar gap-6">
+                        {/* Circle Logo on Mobile */}
+                        <div
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="flex-[0.5] flex justify-start items-center shrink-0"
+                        >
+                            <div className={clsx("cursor-pointer w-5 h-5 rounded-full shrink-0 border-[4px] bg-transparent flex items-center justify-center", isLight ? "border-black" : "border-white")}>
+                                <div className={clsx("w-1.5 h-1.5 rounded-full", isLight ? "bg-black" : "bg-white")} />
+                            </div>
+                        </div>
 
-                <a
-                    id="emailPlane"
-                    href="mailto:osmankoycu@gmail.com"
-                    className={clsx(
-                        "hidden md:block cursor-pointer transition-colors duration-300 hover:text-[#1F1F1F]",
-                        isDark ? "text-white" : "text-black"
-                    )}
-                    aria-label="Send email"
-                >
-                    <svg
-                        width="32"
-                        height="32"
-                        viewBox="0 0 32 32"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="fill-current"
-                    >
-                        <path d="M18.9466 32C18.1425 32 17.5165 31.7455 17.0687 31.2366C16.631 30.7277 16.285 30.0814 16.0305 29.2977L14.1069 23.2061C13.9033 22.5751 13.8372 21.9746 13.9084 21.4046C13.9796 20.8244 14.2341 20.2901 14.6718 19.8015L30.0153 2.76336C30.1272 2.64122 30.1781 2.50382 30.1679 2.35115C30.1679 2.19847 30.1221 2.07125 30.0305 1.96947C29.9389 1.86768 29.8168 1.81679 29.6641 1.81679C29.5115 1.81679 29.369 1.87277 29.2366 1.98473L12.1374 17.3282C11.5878 17.8168 11.0585 18.0814 10.5496 18.1221C10.0407 18.1628 9.4402 18.0712 8.74809 17.8473L2.67176 15.9389C1.88804 15.6947 1.24682 15.3537 0.748092 14.916C0.249364 14.4784 0 13.8575 0 13.0534C0 12.341 0.21374 11.7455 0.641221 11.2672C1.07888 10.7888 1.64885 10.4122 2.35115 10.1374L28.1374 0.305344C28.402 0.203562 28.6616 0.127226 28.916 0.0763359C29.1705 0.0254453 29.4148 0 29.6489 0C30.3613 0 30.9313 0.21374 31.3588 0.641221C31.7863 1.0687 32 1.63868 32 2.35115C32 2.57506 31.9746 2.81425 31.9237 3.0687C31.8728 3.32316 31.7964 3.58779 31.6947 3.8626L21.8626 29.6489C21.5878 30.3511 21.2112 30.916 20.7328 31.3435C20.2545 31.7812 19.659 32 18.9466 32Z" />
-                    </svg>
-                </a>
+                        {navItems.map((item) => {
+                            const isActive =
+                                item.href === '/'
+                                    ? pathname === '/' || pathname === '/product'
+                                    : pathname.startsWith(item.href)
+
+                            return (
+                                <div
+                                    key={item.href}
+                                    className="flex-1 flex justify-center shrink-0"
+                                >
+                                    <Link
+                                        href={item.href}
+                                        className={clsx(
+                                            'transition-all duration-200 text-[16px] whitespace-nowrap overflow-hidden relative min-w-[80px] text-center block',
+                                            isActive
+                                                ? (isLight ? 'text-black font-bold' : 'text-white font-bold')
+                                                : (isLight ? 'text-black/40 font-semibold' : 'text-[#9c9c9c] font-semibold')
+                                        )}
+                                    >
+                                        {item.href === '/about' ? (
+                                            <div className="relative flex justify-center items-center h-full">
+                                                <AnimatePresence mode="wait" initial={false}>
+                                                    <motion.span
+                                                        key={item.label}
+                                                        initial={{ y: 10, opacity: 0 }}
+                                                        animate={{ y: 0, opacity: 1 }}
+                                                        exit={{ y: -10, opacity: 0 }}
+                                                        transition={{ duration: 0.2, ease: "easeOut" }}
+                                                        className="block"
+                                                    >
+                                                        {item.label}
+                                                    </motion.span>
+                                                </AnimatePresence>
+                                            </div>
+                                        ) : (
+                                            item.label
+                                        )}
+                                    </Link>
+                                </div>
+                            )
+                        })}
+
+                        {/* Mobile Email Icon - Inside the scrollable area */}
+                        <div
+                            className="flex-[0.5] flex justify-end items-center shrink-0"
+                        >
+                            <a
+                                href="mailto:osmankoycu@gmail.com"
+                                className={clsx(
+                                    "shrink-0 cursor-pointer transition-colors duration-300",
+                                    isLight ? "text-black" : "text-white"
+                                )}
+                                aria-label="Send email"
+                            >
+                                <svg width="22" height="18" viewBox="0 0 26 21" fill="none" xmlns="http://www.w3.org/2000/svg" className="fill-current">
+                                    <path d="M5.9834 8.08887H11.3867C11.6374 8.08887 11.8522 7.99219 12.0312 7.79883C12.2103 7.60547 12.2998 7.39062 12.2998 7.1543C12.2998 6.88932 12.2103 6.66732 12.0312 6.48828C11.8594 6.30208 11.6445 6.20898 11.3867 6.20898H5.9834C5.72559 6.20898 5.51074 6.30208 5.33887 6.48828C5.16699 6.67448 5.08105 6.89648 5.08105 7.1543C5.08105 7.39062 5.16699 7.60547 5.33887 7.79883C5.5179 7.99219 5.73275 8.08887 5.9834 8.08887ZM5.9834 10.8926H9.77539C10.026 10.8926 10.2409 10.8031 10.4199 10.624C10.599 10.4378 10.6885 10.2194 10.6885 9.96875C10.6885 9.71094 10.599 9.48893 10.4199 9.30273C10.248 9.11654 10.0332 9.02344 9.77539 9.02344H5.9834C5.72559 9.02344 5.51074 9.11654 5.33887 9.30273C5.16699 9.48893 5.08105 9.71094 5.08105 9.96875C5.08105 10.2194 5.16699 10.4378 5.33887 10.624C5.5179 10.8031 5.73275 10.8926 5.9834 10.8926ZM18.0684 10.9893C18.5625 10.9893 19.0065 10.8711 19.4004 10.6348C19.8014 10.3913 20.1201 10.069 20.3564 9.66797C20.5999 9.26693 20.7217 8.81934 20.7217 8.3252C20.7217 7.83105 20.5999 7.38346 20.3564 6.98242C20.1201 6.57422 19.8014 6.25195 19.4004 6.01562C19.0065 5.7793 18.5625 5.66113 18.0684 5.66113C17.5814 5.66113 17.1338 5.7793 16.7256 6.01562C16.3245 6.25195 16.0059 6.57422 15.7695 6.98242C15.5332 7.38346 15.415 7.83105 15.415 8.3252C15.415 8.81934 15.5332 9.26693 15.7695 9.66797C16.0059 10.069 16.3245 10.3913 16.7256 10.6348C17.1338 10.8711 17.5814 10.9893 18.0684 10.9893ZM4.01758 20.9473C2.73568 20.9473 1.74382 20.5964 1.04199 19.8945C0.347331 19.1999 0 18.2188 0 16.9512V4.00684C0 2.72493 0.347331 1.73665 1.04199 1.04199C1.74382 0.347331 2.73568 0 4.01758 0H21.7959C23.0706 0 24.0553 0.350911 24.75 1.05273C25.4518 1.7474 25.8027 2.7321 25.8027 4.00684V16.9512C25.8027 18.2188 25.4518 19.1999 24.75 19.8945C24.0553 20.5964 23.0706 20.9473 21.7959 20.9473H4.01758Z" fill="currentColor" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </nav>
     )

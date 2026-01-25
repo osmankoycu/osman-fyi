@@ -1,28 +1,23 @@
 'use client'
 
-import Image from 'next/image'
-import { usePathname } from 'next/navigation'
-import { urlFor, sanityLoader } from '@/lib/sanity.client'
-import { ImageCardData } from '@/types'
+import { VideoCardData } from '@/types'
 import { clsx } from 'clsx'
+import { usePathname } from 'next/navigation'
 
-interface ImageCardProps extends ImageCardData {
+interface VideoCardProps extends VideoCardData {
     className?: string
-    mobileHeightClass?: string
     layout?: 'full' | 'two'
     fillContainer?: boolean
     objectFit?: 'cover' | 'contain'
+    backgroundColor?: string
 }
 
-export function ImageCard({ image, alt, caption, className, backgroundColor, mobileHeightClass, layout = 'full', fillContainer, objectFit }: ImageCardProps) {
+export function VideoCard({ video, alt, caption, className, layout = 'full', fillContainer, objectFit, backgroundColor }: VideoCardProps) {
     const pathname = usePathname()
     const isPhotography = pathname === '/photography'
+    const videoUrl = video?.asset?.url
 
-    const assetRef = image?.asset?._ref || image?.asset?._id
-
-    if (!assetRef) return null
-
-    const aspectRatio = image.asset.metadata?.dimensions?.aspectRatio || 4 / 3
+    if (!videoUrl) return null
 
     const objectFitClass = objectFit
         ? `object-${objectFit}`
@@ -38,16 +33,17 @@ export function ImageCard({ image, alt, caption, className, backgroundColor, mob
                 )}
                 style={{
                     backgroundColor,
-                    aspectRatio: fillContainer ? undefined : aspectRatio
+                    aspectRatio: fillContainer ? undefined : (16 / 9) // Default video aspect ratio
                 }}
             >
-                <Image
-                    loader={sanityLoader}
-                    src={assetRef}
-                    alt={alt || 'Project Image'}
-                    fill
-                    className={objectFitClass}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1920px"
+                <video
+                    src={videoUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className={clsx("w-full h-full", objectFitClass)}
+                    aria-label={alt || 'Project Video'}
                 />
             </div>
             {caption && (

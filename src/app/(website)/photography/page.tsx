@@ -19,18 +19,28 @@ export default async function PhotographyPage() {
                 cities.map((city) => (
                     <article key={city._id} className="w-full">
                         {/* City Header - Text Container (1100px) */}
-                        <header className="container-text mb-12 max-w-none">
-                            <h3 className="text-[18px] md:text-[20px] lg:text-[22px] font-bold text-white mb-0">
-                                {city.title}
-                            </h3>
-                            <div className="flex justify-between items-end text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-[#9C9C9C]">
-                                <span>{city.subtitle}</span>
-                                <span className="text-white">{city.country}</span>
+                        {/* City Header - Aligned with Content Container */}
+                        <header className="max-w-[1920px] mx-auto w-full px-[10px] md:px-5 lg:px-10 mb-[26px] md:mb-[14px]">
+                            <div className="grid grid-cols-1 md:grid-cols-12 items-end gap-0">
+                                {/* Left: Title */}
+                                <h3 className="text-[16px] lg:text-[18px] font-semibold text-white text-center md:text-left order-1 md:col-span-3">
+                                    {city.title}
+                                </h3>
+
+                                {/* Center: Subtitle */}
+                                <div className="text-center text-[#9C9C9C] text-[16px] lg:text-[18px] font-semibold order-2 md:order-2 md:col-span-6">
+                                    {city.subtitle}
+                                </div>
+
+                                {/* Right: Country */}
+                                <div className="text-center md:text-right text-white text-[16px] lg:text-[18px] font-semibold order-3 md:col-span-3">
+                                    {city.country}
+                                </div>
                             </div>
                         </header>
 
                         {/* Inline Photo Rows - Image Container (1200px) */}
-                        <div className="max-w-[1280px] mx-auto w-full px-0 md:px-5 lg:px-10">
+                        <div className="max-w-[1920px] mx-auto w-full px-0 md:px-5 lg:px-10">
                             <RowRenderer rows={city.rows} />
                         </div>
                     </article>

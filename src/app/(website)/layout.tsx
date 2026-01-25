@@ -45,8 +45,8 @@ export default function RootLayout({
             <body>
                 <SmoothScroll />
                 <ThemeRegistry />
-                <Header />
                 <Navbar />
+                <Header />
                 <main className="min-h-screen">
                     {children}
                 </main>

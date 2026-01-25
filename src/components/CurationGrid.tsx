@@ -10,7 +10,7 @@ interface CurationGridProps {
 
 export function CurationGrid({ items }: CurationGridProps) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-[2px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[2px]">
             {items.map((item) => (
                 <a
                     key={item._id}
@@ -27,10 +27,10 @@ export function CurationGrid({ items }: CurationGridProps) {
                                 alt={item.title}
                                 fill
                                 className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                             />
                         )}
-                        <h3 className="absolute bottom-3 left-3 right-3 text-[14px] font-semibold text-black">
+                        <h3 className="absolute bottom-3 left-3 right-3 text-[16px] font-semibold text-black text-center">
                             {item.title}
                         </h3>
                     </div>

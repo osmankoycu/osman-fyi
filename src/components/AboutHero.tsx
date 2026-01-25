@@ -22,7 +22,7 @@ export function AboutHero({ image, alt }: AboutHeroProps) {
                 alt={alt || 'About Hero Image'}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 1200px"
+                sizes="(max-width: 768px) 100vw, 1920px"
                 priority
             />
         </div>

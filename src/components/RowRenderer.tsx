@@ -83,17 +83,22 @@ export function RowRenderer({ rows }: RowRendererProps) {
 
     return (
         <div className="flex flex-col space-y-[2px] w-full px-[10px] md:px-0">
-            {displayedRows.map((row) => {
+            {displayedRows.map((row, index) => {
+                const isFirst = index === 0
+                const animationProps: any = isFirst ? {} : {
+                    initial: { opacity: 0 },
+                    whileInView: { opacity: 1 },
+                    viewport: { once: true, amount: 0.3 },
+                    transition: { duration: 1.2, ease: "easeInOut" }
+                }
+
                 if ('_type' in row && row._type === 'packed-pair') {
                     // Render Packed Pair
                     return (
                         <React.Fragment key={row._key}>
                             {/* Row A: Large - Small */}
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                viewport={{ once: true, amount: 0.3 }}
-                                transition={{ duration: 1.2, ease: "easeInOut" }}
+                                {...animationProps}
                                 className="grid grid-cols-1 min-[1440px]:grid-cols-[2fr_1fr] gap-[2px] w-full"
                             >
                                 <div className={clsx("w-full relative", aspectClass)}>
@@ -135,10 +140,7 @@ export function RowRenderer({ rows }: RowRendererProps) {
                         key={standardRow._key}
                         className="w-full"
                         style={{ backgroundColor: standardRow.backgroundColor }}
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true, amount: 0.3 }}
-                        transition={{ duration: 1.2, ease: "easeInOut" }}
+                        {...animationProps}
                     >
                         {standardRow.layout === 'full' && (
                             <div className={clsx("w-full relative", aspectClass)}>

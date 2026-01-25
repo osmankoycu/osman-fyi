@@ -78,17 +78,23 @@ export function Navbar() {
                                 : pathname.startsWith(item.href)
 
                         const isEmail = item.href.startsWith('mailto:')
+                        const isFirst = index === 0
+                        const isLast = index === navItems.length - 1
 
                         return (
                             <div
                                 key={item.href}
-                                className="shrink-0"
+                                className={clsx(
+                                    "shrink-0",
+                                    isFirst ? "text-left" : isLast ? "text-right" : "text-center"
+                                )}
                             >
                                 {isEmail ? (
                                     <a
                                         href={item.href}
                                         className={clsx(
-                                            'text-center text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative min-w-[80px] block',
+                                            'text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative min-w-[80px] block',
+                                            isFirst ? "text-left" : isLast ? "text-right" : "text-center",
                                             isLight ? 'text-black/40 hover:text-black font-semibold' : 'text-[#9c9c9c] hover:text-white font-semibold'
                                         )}
                                     >
@@ -98,7 +104,8 @@ export function Navbar() {
                                     <Link
                                         href={item.href}
                                         className={clsx(
-                                            'text-center text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative block',
+                                            'text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative block',
+                                            isFirst ? "text-left" : isLast ? "text-right" : "text-center",
                                             item.href === '/about' ? 'w-[140px]' : 'min-w-[80px]',
                                             isActive
                                                 ? (isLight ? 'text-black font-bold' : 'text-white font-bold')
@@ -106,7 +113,10 @@ export function Navbar() {
                                         )}
                                     >
                                         {item.href === '/about' ? (
-                                            <div className="relative flex justify-center items-center h-full">
+                                            <div className={clsx(
+                                                "relative flex items-center h-full",
+                                                isFirst ? "justify-start" : isLast ? "justify-end" : "justify-center"
+                                            )}>
                                                 <AnimatePresence mode="wait" initial={false}>
                                                     <motion.span
                                                         key={item.label}
@@ -189,7 +199,7 @@ export function Navbar() {
                                                     <a
                                                         href={item.href}
                                                         className={clsx(
-                                                            'text-[20px] font-medium transition-colors duration-200',
+                                                            'text-[20px] font-semibold transition-colors duration-200',
                                                             isLight ? 'text-black/40 active:text-black' : 'text-[#9c9c9c] active:text-white'
                                                         )}
                                                     >
@@ -199,7 +209,7 @@ export function Navbar() {
                                                     <Link
                                                         href={item.href}
                                                         className={clsx(
-                                                            'text-[20px] font-medium transition-colors duration-200',
+                                                            'text-[20px] font-semibold transition-colors duration-200',
                                                             isLight ? 'text-black/40 active:text-black' : 'text-[#9c9c9c] active:text-white'
                                                         )}
                                                     >

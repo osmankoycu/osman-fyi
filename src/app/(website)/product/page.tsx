@@ -21,9 +21,20 @@ export default async function ProductPage() {
                         <article key={project._id} className="w-full">
                             {/* Project Header - Aligned with Content Container */}
                             <header className="max-w-[1920px] mx-auto w-full px-[10px] md:px-5 lg:px-10 mb-[26px] md:mb-[14px]">
-                                <div className="grid grid-cols-1 md:grid-cols-12 items-end gap-0">
+                                {/* Mobile Header Layout */}
+                                <div className="md:hidden flex flex-col items-center gap-1">
+                                    <div className="text-[20px] font-bold text-black text-center">
+                                        {project.title}, {project.year || '2026'}
+                                    </div>
+                                    <div className="text-[16px] font-semibold text-[#9C9C9C] text-center">
+                                        {project.roleLine}
+                                    </div>
+                                </div>
+
+                                {/* Desktop Header Layout */}
+                                <div className="hidden md:grid md:grid-cols-12 items-end gap-0">
                                     {/* Left: Title */}
-                                    <h3 className="text-[16px] lg:text-[18px] font-semibold text-black text-center md:text-left order-1 md:col-span-3">
+                                    <h3 className="text-[16px] lg:text-[18px] font-bold text-black text-left order-1 md:col-span-3">
                                         {project.title}
                                     </h3>
 
@@ -33,7 +44,7 @@ export default async function ProductPage() {
                                     </div>
 
                                     {/* Right: Year */}
-                                    <div className="text-center md:text-right text-black text-[16px] lg:text-[18px] font-semibold order-3 md:col-span-3">
+                                    <div className="text-right text-black text-[16px] lg:text-[18px] font-bold order-3 md:col-span-3">
                                         {project.year || '2026'}
                                     </div>
                                 </div>

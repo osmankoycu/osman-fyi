@@ -20,20 +20,20 @@ export default async function PhotographyPage() {
                     <article key={city._id} className="w-full">
                         {/* City Header - Text Container (1100px) */}
                         {/* City Header - Aligned with Content Container */}
-                        <header className="max-w-[1920px] mx-auto w-full px-[10px] md:px-5 lg:px-10 mb-3 md:mb-5">
-                            <div className="grid grid-cols-1 md:grid-cols-12 items-end gap-1 md:gap-0">
+                        <header className="max-w-[1920px] mx-auto w-full px-[10px] md:px-5 lg:px-10 mb-[26px] md:mb-[14px]">
+                            <div className="grid grid-cols-1 md:grid-cols-12 items-end gap-0">
                                 {/* Left: Title */}
-                                <h3 className="text-[18px] font-semibold text-white order-1 md:col-span-3">
+                                <h3 className="text-[16px] lg:text-[18px] font-semibold text-white text-center md:text-left order-1 md:col-span-3">
                                     {city.title}
                                 </h3>
 
                                 {/* Center: Subtitle */}
-                                <div className="text-left md:text-center text-[#9C9C9C] text-[18px] font-semibold order-2 md:order-2 mt-1 md:mt-0 md:col-span-6">
+                                <div className="text-center text-[#9C9C9C] text-[16px] lg:text-[18px] font-semibold order-2 md:order-2 md:col-span-6">
                                     {city.subtitle}
                                 </div>
 
                                 {/* Right: Country */}
-                                <div className="text-left md:text-right text-white text-[18px] font-semibold order-3 md:col-span-3">
+                                <div className="text-center md:text-right text-white text-[16px] lg:text-[18px] font-semibold order-3 md:col-span-3">
                                     {city.country}
                                 </div>
                             </div>

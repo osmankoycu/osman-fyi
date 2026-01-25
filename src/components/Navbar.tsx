@@ -81,7 +81,7 @@ export function Navbar() {
                                 <Link
                                     href={item.href}
                                     className={clsx(
-                                        'text-center text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative min-w-[80px]',
+                                        'text-center text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative min-w-[80px]',
                                         isActive
                                             ? (isLight ? 'text-black font-bold' : 'text-white font-bold')
                                             : (isLight ? 'text-black/40 hover:text-black font-semibold' : 'text-[#9c9c9c] hover:text-white font-semibold')

@@ -30,7 +30,7 @@ export function CurationGrid({ items }: CurationGridProps) {
                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                             />
                         )}
-                        <h3 className="absolute bottom-3 left-3 right-3 text-[14px] font-semibold text-black">
+                        <h3 className="absolute bottom-3 left-3 right-3 text-[16px] lg:text-[18px] font-semibold text-black">
                             {item.title}
                         </h3>
                     </div>

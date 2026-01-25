@@ -15,11 +15,11 @@ body {
 }
 
 .container-custom {
-  @apply max-w-[1280px] mx-auto px-[10px] md:px-5 lg:px-10;
+  @apply max-w-[1920px] mx-auto px-[10px] md:px-5 lg:px-10;
 }
 
 .container-text {
-  @apply max-w-[1280px] mx-auto px-[10px] md:px-5 lg:px-10;
+  @apply max-w-[1920px] mx-auto px-[10px] md:px-5 lg:px-10;
 }
 
 .separator {

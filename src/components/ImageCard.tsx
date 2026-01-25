@@ -45,7 +45,7 @@ export function ImageCard({ image, alt, caption, className, backgroundColor, mob
                     alt={alt || 'Project Image'}
                     fill
                     className={objectFitClass}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1920px"
                 />
             </div>
             {caption && (

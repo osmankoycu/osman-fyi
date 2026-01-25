@@ -56,13 +56,21 @@ export function Navbar() {
             <div className="container-text flex items-center justify-between w-full h-full">
                 {/* Desktop Layout - Flat List with Equal Spacing */}
                 <div className="hidden md:flex w-full items-center justify-between">
+                    <div className="flex-[0.5] flex justify-start">
+                        <div
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className={clsx("cursor-pointer w-6 h-6 rounded-full shrink-0 border-[5px] bg-transparent flex items-center justify-center", isDark ? "border-white" : "border-black")}
+                        >
+                            <div className={clsx("w-2 h-2 rounded-full", isDark ? "bg-white" : "bg-black")} />
+                        </div>
+                    </div>
                     <Link
                         href="/"
                         className={clsx(
-                            'text-[18px] transition-colors duration-200',
+                            'flex-1 text-center text-[18px] transition-colors duration-200',
                             pathname === '/' || pathname === '/product'
                                 ? (isDark ? 'text-white font-bold' : 'text-black font-bold')
-                                : (isDark ? 'text-[#9c9c9c] hover:text-white font-semibold' : 'text-[#9c9c9c] hover:text-black font-semibold')
+                                : (isDark ? 'text-[#9c9c9c] hover:text-white font-semibold' : 'text-black/40 hover:text-black font-semibold')
                         )}
                     >
                         Product
@@ -78,10 +86,10 @@ export function Navbar() {
                             key={item.href}
                             href={item.href}
                             className={clsx(
-                                'text-[18px] transition-colors duration-200',
+                                'flex-1 text-center text-[18px] transition-colors duration-200',
                                 pathname.startsWith(item.href)
                                     ? (isDark ? 'text-white font-bold' : 'text-black font-bold')
-                                    : (isDark ? 'text-[#9c9c9c] hover:text-white font-semibold' : 'text-[#9c9c9c] hover:text-black font-semibold')
+                                    : (isDark ? 'text-[#9c9c9c] hover:text-white font-semibold' : 'text-black/40 hover:text-black font-semibold')
                             )}
                         >
                             {item.label}
@@ -92,7 +100,7 @@ export function Navbar() {
                         id="emailPlane"
                         href="mailto:osmankoycu@gmail.com"
                         className={clsx(
-                            "cursor-pointer transition-colors duration-300 hover:text-[#1F1F1F]",
+                            "flex-[0.5] flex justify-end shrink-0 cursor-pointer transition-colors duration-300 hover:text-[#1F1F1F]",
                             isDark ? "text-white" : "text-black"
                         )}
                         aria-label="Send email"

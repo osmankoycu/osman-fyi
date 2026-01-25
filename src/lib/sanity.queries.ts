@@ -27,7 +27,12 @@ export const projectsByTypeQuery = groq`
         caption,
         text,
         backgroundColor,
-        textColor
+        textColor,
+        video {
+            asset -> {
+                url
+            }
+        }
       }
     }
   }

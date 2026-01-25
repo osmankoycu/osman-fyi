@@ -34,7 +34,19 @@ export interface TextCardData {
     textColor?: string
 }
 
-export type RowItem = ImageCardData | TextCardData
+export interface VideoCardData {
+    _type: 'videoCard'
+    video: {
+        asset: {
+            _ref?: string
+            url?: string
+        }
+    }
+    caption?: string
+    alt?: string
+}
+
+export type RowItem = ImageCardData | TextCardData | VideoCardData
 
 export interface RowData {
     _key: string

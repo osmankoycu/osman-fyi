@@ -3,6 +3,7 @@
 import { RowData, RowItem } from '@/types'
 import { ImageCard } from './ImageCard'
 import { TextCard } from './TextCard'
+import { VideoCard } from './VideoCard'
 import { clsx } from 'clsx'
 import React, { useState, useEffect, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
@@ -184,5 +185,6 @@ interface PackedRowPair {
 function ItemRenderer({ item, className, fillContainer, objectFit }: { item: RowItem, className?: string, fillContainer?: boolean, objectFit?: 'cover' | 'contain' }) {
     if (item._type === 'imageCard') return <ImageCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} />
     if (item._type === 'textCard') return <TextCard {...item} className={className} />
+    if (item._type === 'videoCard') return <VideoCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} />
     return null
 }

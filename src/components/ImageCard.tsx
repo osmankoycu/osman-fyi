@@ -10,9 +10,11 @@ interface ImageCardProps extends ImageCardData {
     className?: string
     mobileHeightClass?: string
     layout?: 'full' | 'two'
+    fillContainer?: boolean
+    objectFit?: 'cover' | 'contain'
 }
 
-export function ImageCard({ image, alt, caption, className, backgroundColor, mobileHeightClass, layout = 'full' }: ImageCardProps) {
+export function ImageCard({ image, alt, caption, className, backgroundColor, mobileHeightClass, layout = 'full', fillContainer, objectFit }: ImageCardProps) {
     const pathname = usePathname()
     const isPhotography = pathname === '/photography'
 
@@ -22,21 +24,21 @@ export function ImageCard({ image, alt, caption, className, backgroundColor, mob
 
     const aspectRatio = image.asset.metadata?.dimensions?.aspectRatio || 4 / 3
 
-    const objectFitClass = layout === 'full'
-        ? "object-cover"
-        : "object-contain md:object-cover"
+    const objectFitClass = objectFit
+        ? `object-${objectFit}`
+        : (layout === 'full' ? "object-cover" : "object-contain md:object-cover")
 
     return (
-        <div className={clsx('flex flex-col space-y-3', className)}>
+        <div className={clsx('flex flex-col space-y-3', fillContainer && 'h-full', className)}>
             <div
                 className={clsx(
-                    "relative overflow-hidden rounded-2xl w-full",
-                    layout === 'two' && !isPhotography && "min-h-[400px] max-h-[450px] md:min-h-0 md:max-h-none",
+                    "relative overflow-hidden rounded w-full",
+                    fillContainer ? "flex-1 min-h-0" : (layout === 'two' && !isPhotography && "min-h-[400px] max-h-[450px] md:min-h-0 md:max-h-none"),
                     isPhotography ? "bg-[#1F1F1F]" : "bg-gray-100"
                 )}
                 style={{
                     backgroundColor,
-                    aspectRatio: aspectRatio
+                    aspectRatio: fillContainer ? undefined : aspectRatio
                 }}
             >
                 <Image

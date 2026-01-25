@@ -50,24 +50,22 @@ export function Navbar() {
     return (
         <nav
             className={clsx(
-                'w-full sticky top-0 z-50 flex items-center transition-[height] duration-300 backdrop-blur-md h-[60px] md:h-[80px]',
-                isLight ? 'bg-white/80' : 'bg-black/80'
+                'w-full sticky top-0 z-50 flex items-center transition-[height] duration-300 h-[60px] md:h-[80px]',
+                isLight ? 'bg-white' : 'bg-black'
             )}
         >
             <div className="container-text flex items-center justify-between w-full h-full">
                 {/* Desktop Layout - Equal Spacing between all items */}
                 <div className="hidden md:flex w-full items-center justify-between gap-4">
                     {/* Circle Logo */}
-                    <motion.div
-                        layout
-                        transition={{ layout: { duration: 0.3, ease: "easeOut" } }}
+                    <div
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         className="flex-[0.5] flex justify-start items-center shrink-0"
                     >
                         <div className={clsx("cursor-pointer w-6 h-6 rounded-full shrink-0 border-[5px] bg-transparent flex items-center justify-center", isLight ? "border-black" : "border-white")}>
                             <div className={clsx("w-2 h-2 rounded-full", isLight ? "bg-black" : "bg-white")} />
                         </div>
-                    </motion.div>
+                    </div>
 
                     {navItems.map((item) => {
                         const isActive =
@@ -76,10 +74,8 @@ export function Navbar() {
                                 : pathname.startsWith(item.href)
 
                         return (
-                            <motion.div
-                                layout
+                            <div
                                 key={item.href}
-                                transition={{ layout: { duration: 0.3, ease: "easeOut" } }}
                                 className="flex-1 flex justify-center"
                             >
                                 <Link
@@ -110,14 +106,12 @@ export function Navbar() {
                                         item.label
                                     )}
                                 </Link>
-                            </motion.div>
+                            </div>
                         )
                     })}
 
                     {/* Email Icon as part of the list */}
-                    <motion.div
-                        layout
-                        transition={{ layout: { duration: 0.3, ease: "easeOut" } }}
+                    <div
                         className="flex-[0.5] flex justify-end items-center shrink-0"
                     >
                         <a
@@ -140,23 +134,21 @@ export function Navbar() {
                                 <path d="M18.9466 32C18.1425 32 17.5165 31.7455 17.0687 31.2366C16.631 30.7277 16.285 30.0814 16.0305 29.2977L14.1069 23.2061C13.9033 22.5751 13.8372 21.9746 13.9084 21.4046C13.9796 20.8244 14.2341 20.2901 14.6718 19.8015L30.0153 2.76336C30.1272 2.64122 30.1781 2.50382 30.1679 2.35115C30.1679 2.19847 30.1221 2.07125 30.0305 1.96947C29.9389 1.86768 29.8168 1.81679 29.6641 1.81679C29.5115 1.81679 29.369 1.87277 29.2366 1.98473L12.1374 17.3282C11.5878 17.8168 11.0585 18.0814 10.5496 18.1221C10.0407 18.1628 9.4402 18.0712 8.74809 17.8473L2.67176 15.9389C1.88804 15.6947 1.24682 15.3537 0.748092 14.916C0.249364 14.4784 0 13.8575 0 13.0534C0 12.341 0.21374 11.7455 0.641221 11.2672C1.07888 10.7888 1.64885 10.4122 2.35115 10.1374L28.1374 0.305344C28.402 0.203562 28.6616 0.127226 28.916 0.0763359C29.1705 0.0254453 29.4148 0 29.6489 0C30.3613 0 30.9313 0.21374 31.3588 0.641221C31.7863 1.0687 32 1.63868 32 2.35115C32 2.57506 31.9746 2.81425 31.9237 3.0687C31.8728 3.32316 31.7964 3.58779 31.6947 3.8626L21.8626 29.6489C21.5878 30.3511 21.2112 30.916 20.7328 31.3435C20.2545 31.7812 19.659 32 18.9466 32Z" />
                             </svg>
                         </a>
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* Mobile Layout (Scrollable with all items) */}
                 <div className="md:hidden flex items-center w-full h-full">
                     <div className="flex items-center justify-between w-full overflow-x-auto no-scrollbar gap-6">
                         {/* Circle Logo on Mobile */}
-                        <motion.div
-                            layout
-                            transition={{ layout: { duration: 0.3, ease: "easeOut" } }}
+                        <div
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             className="flex-[0.5] flex justify-start items-center shrink-0"
                         >
                             <div className={clsx("cursor-pointer w-5 h-5 rounded-full shrink-0 border-[4px] bg-transparent flex items-center justify-center", isLight ? "border-black" : "border-white")}>
                                 <div className={clsx("w-1.5 h-1.5 rounded-full", isLight ? "bg-black" : "bg-white")} />
                             </div>
-                        </motion.div>
+                        </div>
 
                         {navItems.map((item) => {
                             const isActive =
@@ -165,16 +157,14 @@ export function Navbar() {
                                     : pathname.startsWith(item.href)
 
                             return (
-                                <motion.div
-                                    layout
+                                <div
                                     key={item.href}
-                                    transition={{ layout: { duration: 0.3, ease: "easeOut" } }}
                                     className="flex-1 flex justify-center shrink-0"
                                 >
                                     <Link
                                         href={item.href}
                                         className={clsx(
-                                            'transition-all duration-200 text-[18px] whitespace-nowrap overflow-hidden relative min-w-[80px] text-center block',
+                                            'transition-all duration-200 text-[16px] whitespace-nowrap overflow-hidden relative min-w-[80px] text-center block',
                                             isActive
                                                 ? (isLight ? 'text-black font-bold' : 'text-white font-bold')
                                                 : (isLight ? 'text-black/40 font-semibold' : 'text-[#9c9c9c] font-semibold')
@@ -199,14 +189,12 @@ export function Navbar() {
                                             item.label
                                         )}
                                     </Link>
-                                </motion.div>
+                                </div>
                             )
                         })}
 
                         {/* Mobile Email Icon - Inside the scrollable area */}
-                        <motion.div
-                            layout
-                            transition={{ layout: { duration: 0.3, ease: "easeOut" } }}
+                        <div
                             className="flex-[0.5] flex justify-end items-center shrink-0"
                         >
                             <a
@@ -221,7 +209,7 @@ export function Navbar() {
                                     <path d="M18.9466 32C18.1425 32 17.5165 31.7455 17.0687 31.2366C16.631 30.7277 16.285 30.0814 16.0305 29.2977L14.1069 23.2061C13.9033 22.5751 13.8372 21.9746 13.9084 21.4046C13.9796 20.8244 14.2341 20.2901 14.6718 19.8015L30.0153 2.76336C30.1272 2.64122 30.1781 2.50382 30.1679 2.35115C30.1679 2.19847 30.1221 2.07125 30.0305 1.96947C29.9389 1.86768 29.8168 1.81679 29.6641 1.81679C29.5115 1.81679 29.369 1.87277 29.2366 1.98473L12.1374 17.3282C11.5878 17.8168 11.0585 18.0814 10.5496 18.1221C10.0407 18.1628 9.4402 18.0712 8.74809 17.8473L2.67176 15.9389C1.88804 15.6947 1.24682 15.3537 0.748092 14.916C0.249364 14.4784 0 13.8575 0 13.0534C0 12.341 0.21374 11.7455 0.641221 11.2672C1.07888 10.7888 1.64885 10.4122 2.35115 10.1374L28.1374 0.305344C28.402 0.203562 28.6616 0.127226 28.916 0.0763359C29.1705 0.0254453 29.4148 0 29.6489 0C30.3613 0 30.9313 0.21374 31.3588 0.641221C31.7863 1.0687 32 1.63868 32 2.35115C32 2.57506 31.9746 2.81425 31.9237 3.0687C31.8728 3.32316 31.7964 3.58779 31.6947 3.8626L21.8626 29.6489C21.5878 30.3511 21.2112 30.916 20.7328 31.3435C20.2545 31.7812 19.659 32 18.9466 32Z" />
                                 </svg>
                             </a>
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
             </div>

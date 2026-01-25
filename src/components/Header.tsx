@@ -54,7 +54,7 @@ export function Header() {
                     Osman Köycü, <br className="md:hidden" /> {content.title}
                 </span>
                 <br />
-                <span className={clsx("font-normal", isDark ? "text-[#9c9c9c]" : "text-[#1F1F1F]")}>
+                <span className={clsx("font-medium", isDark ? "text-[#9c9c9c]" : "text-[#1F1F1F]")}>
                     {content.description}
                 </span>
             </h1>

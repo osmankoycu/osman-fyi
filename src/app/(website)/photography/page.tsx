@@ -41,7 +41,7 @@ export default async function PhotographyPage() {
 
                         {/* Inline Photo Rows - Image Container (1200px) */}
                         <div className="max-w-[1920px] mx-auto w-full px-0 md:px-5 lg:px-10">
-                            <RowRenderer rows={city.rows} />
+                            <RowRenderer rows={city.rows} aspectRatio="3/2" />
                         </div>
                     </article>
                 ))

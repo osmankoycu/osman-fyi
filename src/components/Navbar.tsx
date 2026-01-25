@@ -53,7 +53,7 @@ export function Navbar() {
         { label: 'Experiments', href: '/experiments' },
         { label: 'Photography', href: '/photography' },
         { label: 'Curation', href: '/curation' },
-        { label: isStuck ? 'Osman Köycü' : 'About', href: '/about' },
+        { label: isStuck ? 'Osman Köycü' : 'About Me', href: '/about' },
         { label: 'Email', href: 'mailto:osmankoycu@gmail.com' },
     ]
 
@@ -106,7 +106,7 @@ export function Navbar() {
                                         className={clsx(
                                             'text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative block',
                                             isFirst ? "text-left" : isLast ? "text-right" : "text-center",
-                                            item.href === '/about' ? 'w-[140px]' : 'min-w-[80px]',
+                                            item.href === '/about' ? 'w-[116px]' : 'min-w-[80px]',
                                             isActive
                                                 ? (isLight ? 'text-black font-bold' : 'text-white font-bold')
                                                 : (isLight ? 'text-black/40 hover:text-black font-semibold' : 'text-[#9c9c9c] hover:text-white font-semibold')
@@ -154,7 +154,7 @@ export function Navbar() {
                                 item.href === '/'
                                     ? pathname === '/' || pathname === '/product'
                                     : pathname.startsWith(item.href)
-                            )?.label || (pathname === '/about' ? (isStuck ? 'Osman Köycü' : 'About') : 'Product')}
+                            )?.label || (pathname === '/about' ? (isStuck ? 'Osman Köycü' : 'About Me') : 'Product')}
                         </span>
                         <motion.svg
                             width="10"

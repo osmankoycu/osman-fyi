@@ -45,14 +45,16 @@ export function Header() {
     const isDark = pathname === '/photography'
 
     return (
-        <header className="container-text h-[calc(100dvh-200px)] mb-12 flex flex-col justify-center items-center text-center">
+        <header className="container-text h-[calc(100dvh-200px)] mb-12 flex flex-col justify-center items-center text-center !px-[40px] md:!px-4">
             <h1 className={clsx(
-                "text-[28px] md:text-[32px] leading-[38px] md:leading-[42px] mb-6 md:mb-8 max-w-[900px]",
+                "text-[28px] md:text-[32px] leading-[34px] md:leading-[42px] mb-6 md:mb-8 max-w-[900px]",
                 isDark ? "text-white" : "text-black"
             )}>
-                <span className="font-bold">Osman Köycü, {content.title}</span>
-                <br className="hidden md:block" />
-                <span className={clsx("font-normal ml-1 md:ml-0", isDark ? "text-[#9c9c9c]" : "text-[#1F1F1F]")}>
+                <span className="font-bold">
+                    Osman Köycü, <br className="md:hidden" /> {content.title}
+                </span>
+                <br />
+                <span className={clsx("font-normal", isDark ? "text-[#9c9c9c]" : "text-[#1F1F1F]")}>
                     {content.description}
                 </span>
             </h1>

@@ -33,7 +33,7 @@ export function Header() {
                     title: 'Independent Designer.',
                     description: (
                         <>
-                            Currently working on <a href="http://image.inc" target="_blank" rel="noopener noreferrer" className="font-medium text-black border-b-[1.5px] border-black pb-0.5 hover:text-[#4a4a4a] hover:border-[#4a4a4a] transition-colors">Image Inc.</a>, based in New York.
+                            Currently building <a href="http://image.inc" target="_blank" rel="noopener noreferrer" className="font-medium text-black border-b-[1.5px] border-black pb-0.5 hover:text-[#4a4a4a] hover:border-[#4a4a4a] transition-colors">Image Inc.</a>, based in New York.
                         </>
                     )
                 }
@@ -47,12 +47,12 @@ export function Header() {
     return (
         <header className="container-text h-[calc(100dvh-200px)] mb-12 flex flex-col justify-center items-center text-center">
             <h1 className={clsx(
-                "text-[32px] leading-[42px] mb-6 md:mb-8 max-w-[900px]",
+                "text-[28px] md:text-[32px] leading-[38px] md:leading-[42px] mb-6 md:mb-8 max-w-[900px]",
                 isDark ? "text-white" : "text-black"
             )}>
                 <span className="font-bold">Osman Köycü, {content.title}</span>
-                <br />
-                <span className={clsx("font-normal", isDark ? "text-[#9c9c9c]" : "text-[#1F1F1F]")}>
+                <br className="hidden md:block" />
+                <span className={clsx("font-normal ml-1 md:ml-0", isDark ? "text-[#9c9c9c]" : "text-[#1F1F1F]")}>
                     {content.description}
                 </span>
             </h1>

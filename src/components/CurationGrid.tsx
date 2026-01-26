@@ -26,7 +26,7 @@ export function CurationGrid({ items }: CurationGridProps) {
                                 src={item.image.asset._ref || item.image.asset._id || ''}
                                 alt={item.title}
                                 fill
-                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                className="object-cover transition-transform duration-500 scale-[0.85] group-hover:scale-[0.9]"
                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                             />
                         )}

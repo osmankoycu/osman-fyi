@@ -82,6 +82,7 @@ export const aboutPageQuery = groq`
   *[_type == "about"][0] {
     _id,
     heroImage,
+    heroImage2,
     bio
   }
 `

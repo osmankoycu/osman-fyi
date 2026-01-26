@@ -85,5 +85,6 @@ export interface CurationItemData {
 export interface AboutPageData {
     _id: string
     heroImage?: SanityImage
+    heroImage2?: SanityImage
     bio?: PortableTextBlock[]
 }

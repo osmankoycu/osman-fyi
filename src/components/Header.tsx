@@ -11,26 +11,26 @@ export function Header() {
             case '/experiments':
                 return {
                     title: 'Design Engineer.',
-                    description: 'I design and build hands-on experiments to explore ideas, tools, and concepts, without a fixed outcome or expectation.'
+                    description: 'Building hands-on experiments around ideas, tools, and concepts.'
                 }
             case '/photography':
                 return {
                     title: 'Hobbyist Photographer.',
-                    description: 'I take photos in my free time, mostly while traveling and in everyday life. It’s a personal hobby and a way for me to capture small, quiet moments.'
+                    description: 'Capturing everyday moments and travels as a personal hobby.'
                 }
             case '/curation':
                 return {
                     title: 'Product Enthusiast.',
-                    description: 'A personal collection of products and ideas I find thoughtful, well-crafted, and inspiring.'
+                    description: 'Collecting well-crafted and inspiring products and ideas.'
                 }
             case '/about':
                 return {
                     title: 'Human.',
-                    description: 'Outside of work, I’m a husband and a father. This site is a personal space where I share what I build, explore, and stay curious about.'
+                    description: 'Designer and builder. Husband and father.'
                 }
             default:
                 return {
-                    title: 'Independent Designer.',
+                    title: 'Designer.',
                     description: (
                         <>
                             Currently building <a href="http://image.inc" target="_blank" rel="noopener noreferrer" className="font-medium text-black border-b-[1.5px] border-black pb-0.5 hover:text-[#4a4a4a] hover:border-[#4a4a4a] transition-colors">Image Inc.</a>, based in New York.

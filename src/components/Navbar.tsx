@@ -52,7 +52,7 @@ export function Navbar() {
         { label: 'Product', href: '/' },
         { label: 'Experiments', href: '/experiments' },
         { label: 'Photography', href: '/photography' },
-        { label: 'Curation', href: '/curation' },
+        { label: 'Collection', href: '/curation' },
         { label: isStuck ? 'Osman Köycü' : 'About Me', href: '/about' },
         { label: 'Email', href: 'mailto:osmankoycu@gmail.com' },
     ]

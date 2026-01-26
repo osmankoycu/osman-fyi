@@ -39,7 +39,7 @@ export const projectsByTypeQuery = groq`
 `
 
 export const photoCitiesQuery = groq`
-  *[_type == "photoCity"] | order(title asc) {
+  *[_type == "photoCity"] | order(order asc) {
     _id,
     title,
     slug,
@@ -74,7 +74,18 @@ export const curationItemsQuery = groq`
     _id,
     title,
     image,
-    url
+    url,
+    category->{
+        title,
+        slug
+    }
+  }
+`
+
+export const curationCategoriesQuery = groq`
+  *[_type == "curationCategory"] | order(order asc) {
+    title,
+    slug
   }
 `
 

@@ -75,11 +75,17 @@ export interface PhotoCityData {
     rows?: RowData[]
 }
 
+export interface CurationCategoryData {
+    title: string
+    slug: { current: string }
+}
+
 export interface CurationItemData {
     _id: string
     title: string
     image: SanityImage
     url: string
+    category?: CurationCategoryData
 }
 
 export interface AboutPageData {

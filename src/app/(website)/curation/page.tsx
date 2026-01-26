@@ -1,30 +1,26 @@
 import { client } from '@/lib/sanity.client'
-import { curationItemsQuery } from '@/lib/sanity.queries'
-import { CurationItemData } from '@/types'
-import { CurationGrid } from '@/components/CurationGrid'
+import { curationItemsQuery, curationCategoriesQuery } from '@/lib/sanity.queries'
+import { CurationItemData, CurationCategoryData } from '@/types'
+import { CurationContainer } from '@/components/CurationContainer'
 
 export const revalidate = 60
 
 export default async function CurationPage() {
     let items: CurationItemData[] = []
+    let categories: CurationCategoryData[] = []
+
     try {
-        items = await client.fetch<CurationItemData[]>(curationItemsQuery)
+        [items, categories] = await Promise.all([
+            client.fetch<CurationItemData[]>(curationItemsQuery),
+            client.fetch<CurationCategoryData[]>(curationCategoriesQuery)
+        ])
     } catch (error) {
-        console.warn('Failed to fetch curation items:', error)
+        console.warn('Failed to fetch curation data:', error)
     }
 
     return (
         <div className="container-custom pb-24">
-
-            {
-                items.length > 0 ? (
-                    <CurationGrid items={items} />
-                ) : (
-                    <div className="py-12 text-center border-t border-gray-100">
-                        <p className="text-gray-500">No curated items found.</p>
-                    </div>
-                )
-            }
+            <CurationContainer items={items} categories={categories} />
         </div >
     )
 }

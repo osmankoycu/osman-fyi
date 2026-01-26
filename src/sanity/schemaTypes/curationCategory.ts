@@ -1,13 +1,13 @@
 import { defineField, defineType } from 'sanity'
 
-export const photoCity = defineType({
-    name: 'photoCity',
-    title: 'Photography City',
+export const curationCategory = defineType({
+    name: 'curationCategory',
+    title: 'Curation Category',
     type: 'document',
     fields: [
         defineField({
             name: 'title',
-            title: 'City Name',
+            title: 'Title',
             type: 'string',
             validation: (rule) => rule.required(),
         }),
@@ -25,23 +25,7 @@ export const photoCity = defineType({
             name: 'order',
             title: 'Order',
             type: 'number',
-            description: 'Order of the city in the list (1, 2, 3...)',
-        }),
-        defineField({
-            name: 'country',
-            title: 'Country',
-            type: 'string',
-        }),
-        defineField({
-            name: 'subtitle',
-            title: 'Subtitle / Date',
-            type: 'string',
-        }),
-        defineField({
-            name: 'rows',
-            title: 'Photos',
-            type: 'array',
-            of: [{ type: 'row' }],
+            description: 'Order of the category in the menu (1, 2, 3...)',
         }),
     ],
 })

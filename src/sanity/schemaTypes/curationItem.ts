@@ -25,5 +25,12 @@ export const curationItem = defineType({
             title: 'External URL',
             type: 'url',
         }),
+        defineField({
+            name: 'category',
+            title: 'Category',
+            type: 'reference',
+            to: [{ type: 'curationCategory' }],
+            validation: (rule) => rule.required(),
+        }),
     ],
 })

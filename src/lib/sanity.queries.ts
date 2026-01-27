@@ -1,11 +1,10 @@
 import { groq } from 'next-sanity'
 
 export const projectsByTypeQuery = groq`
-  *[_type == "project" && type == $type] | order(year desc) {
+  *[_type == $type] | order(orderRank) {
     _id,
     title,
     slug,
-    type,
     year,
     roleLine,
     rows[] {

@@ -1,5 +1,7 @@
 import { type SchemaTypeDefinition } from 'sanity'
-import { project } from './project'
+import { product } from './product'
+import { experiment } from './experiment'
+import { project } from './project' // Keeping for safety if needed, but removing from types to hide it
 import { photoCity } from './photoCity'
 import { curationItem } from './curationItem'
 import { row } from './objects/row'
@@ -8,5 +10,5 @@ import { textCard } from './objects/textCard'
 import { videoCard } from './objects/videoCard'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-    types: [project, photoCity, curationItem, row, imageCard, textCard, videoCard],
+    types: [product, experiment, project, photoCity, curationItem, row, imageCard, textCard, videoCard],
 }

@@ -1,5 +1,6 @@
 import { type SchemaTypeDefinition } from 'sanity'
-import { project } from './project'
+import { product } from './product'
+import { experiment } from './experiment'
 import { photoCity } from './photoCity'
 import { curationCategory } from './curationCategory'
 import { curationItem } from './curationItem'
@@ -10,5 +11,5 @@ import { videoCard } from './objects/videoCard'
 import { about } from './about'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [project, photoCity, curationCategory, curationItem, row, imageCard, textCard, videoCard, about],
+  types: [product, experiment, photoCity, curationCategory, curationItem, row, imageCard, textCard, videoCard, about],
 }

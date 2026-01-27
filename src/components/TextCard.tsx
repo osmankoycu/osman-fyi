@@ -28,11 +28,11 @@ export function TextCard({ text, className, backgroundColor, textColor }: TextCa
     return (
         <div
             className={clsx(
-                'flex flex-col justify-center p-8 md:p-10 lg:p-12 bg-gray-50 rounded w-full h-full min-h-0 overflow-y-auto no-scrollbar',
+                'flex flex-col justify-center p-8 md:p-10 lg:p-12 bg-gray-50 rounded-lg w-full h-full min-h-0 overflow-y-auto no-scrollbar',
                 isLongText
                     ? 'text-[clamp(24px,3.125vw,48px)] min-[1440px]:text-[clamp(24px,2.08vw,40px)]'
                     : 'text-[clamp(24px,3.125vw,48px)] min-[1440px]:text-[clamp(24px,2.08vw,40px)]',
-                'leading-tight font-semibold text-black',
+                'leading-tight font-semibold text-black relative',
                 className
             )}
             style={{
@@ -41,6 +41,9 @@ export function TextCard({ text, className, backgroundColor, textColor }: TextCa
             }}
         >
             <PortableText value={text} />
+            {(backgroundColor === 'white' || backgroundColor?.toLowerCase() === '#ffffff') && (
+                <div className="absolute inset-0 border border-black/10 mix-blend-multiply pointer-events-none rounded-lg" />
+            )}
         </div>
     )
 }

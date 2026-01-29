@@ -7,11 +7,14 @@ import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePlaneAnimation } from '../hooks/usePlaneAnimation'
+import { useParticleMorph } from '../contexts/ParticleMorphContext'
+import { MorphTarget } from './ParticleMorph'
 
 export function Navbar() {
     const pathname = usePathname()
     const [isStuck, setIsStuck] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const { setCurrentTarget } = useParticleMorph()
     usePlaneAnimation(isStuck)
 
     useEffect(() => {
@@ -49,13 +52,22 @@ export function Navbar() {
     }, [isMobileMenuOpen])
 
     const navItems = [
-        { label: 'Product', href: '/' },
-        { label: 'Experiments', href: '/experiments' },
-        { label: 'Photography', href: '/photography' },
-        { label: 'Collection', href: '/curation' },
-        { label: isStuck ? 'Osman Köycü' : 'About Me', href: '/about' },
-        { label: 'Email', href: 'mailto:osmankoycu@gmail.com' },
+        { label: 'Product', href: '/', morphTarget: 'cube' as MorphTarget },
+        { label: 'Experiments', href: '/experiments', morphTarget: 'flask' as MorphTarget },
+        { label: 'Photography', href: '/photography', morphTarget: 'camera' as MorphTarget },
+        { label: 'Collection', href: '/curation', morphTarget: 'palette' as MorphTarget },
+        { label: isStuck ? 'Osman Köycü' : 'About Me', href: '/about', morphTarget: 'plane' as MorphTarget },
+        { label: 'Email', href: 'mailto:osmankoycu@gmail.com', morphTarget: 'default' as MorphTarget },
     ]
+
+    // Handle hover events for particle morph
+    const handleNavHover = (morphTarget: MorphTarget) => {
+        setCurrentTarget(morphTarget)
+    }
+
+    const handleNavLeave = () => {
+        setCurrentTarget('default')
+    }
 
     const isLight = pathname !== '/photography'
     const isDark = !isLight
@@ -92,6 +104,8 @@ export function Navbar() {
                                 {isEmail ? (
                                     <a
                                         href={item.href}
+                                        onMouseEnter={() => handleNavHover(item.morphTarget)}
+                                        onMouseLeave={handleNavLeave}
                                         className={clsx(
                                             'text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative min-w-[80px] block',
                                             isFirst ? "text-left" : isLast ? "text-right" : "text-center",
@@ -103,6 +117,8 @@ export function Navbar() {
                                 ) : (
                                     <Link
                                         href={item.href}
+                                        onMouseEnter={() => handleNavHover(item.morphTarget)}
+                                        onMouseLeave={handleNavLeave}
                                         className={clsx(
                                             'text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap overflow-hidden relative block',
                                             isFirst ? "text-left" : isLast ? "text-right" : "text-center",

@@ -7,6 +7,7 @@ import { Header } from '@/components/Header'
 import { ThemeRegistry } from '@/components/ThemeRegistry'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { ScrollAwareBlur } from '@/components/ScrollAwareBlur'
+import { ParticleMorphProvider } from '@/contexts/ParticleMorphContext'
 
 export const metadata: Metadata = {
     title: 'Osman Köycü',
@@ -44,15 +45,17 @@ export default function RootLayout({
                 <link rel="stylesheet" href="https://use.typekit.net/skt3avi.css" />
             </head>
             <body>
-                <SmoothScroll />
-                <ThemeRegistry />
-                <Navbar />
-                <Header />
-                <main className="min-h-screen">
-                    {children}
-                </main>
-                <Footer />
-                <ScrollAwareBlur />
+                <ParticleMorphProvider>
+                    <SmoothScroll />
+                    <ThemeRegistry />
+                    <Navbar />
+                    <Header />
+                    <main className="min-h-screen">
+                        {children}
+                    </main>
+                    <Footer />
+                    <ScrollAwareBlur />
+                </ParticleMorphProvider>
             </body>
         </html>
     )

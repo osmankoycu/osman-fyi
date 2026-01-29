@@ -49,7 +49,7 @@ export function Header() {
     const particleColor = isDark ? 0xffffff : 0x000000
 
     return (
-        <header className="relative container-text h-[calc(100dvh-210px)] mb-12 flex flex-col justify-center items-center text-center !px-[30px] md:!px-4 overflow-hidden">
+        <header className="relative container-text h-[calc(100dvh-210px)] mb-12 flex flex-col justify-center items-center text-center !px-[30px] md:!px-4 overflow-visible">
             {/* Particle background */}
             <ParticleMorph target={currentTarget} color={particleColor} isVisible={true} />
 

@@ -3,7 +3,7 @@
 import { useRef, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 
-export type MorphTarget = 'default' | 'flask' | 'camera' | 'cube' | 'palette' | 'plane'
+export type MorphTarget = 'default' | 'atom' | 'camera' | 'cube' | 'palette' | 'plane'
 
 interface ParticleMorphProps {
     target?: MorphTarget
@@ -14,7 +14,7 @@ interface ParticleMorphProps {
 
 export function ParticleMorph({
     target = 'default',
-    particleCount = 3000,
+    particleCount = 6000, // Always use 6000 particles, control via opacity
     isVisible = true,
     color = 0x000000
 }: ParticleMorphProps) {
@@ -24,6 +24,7 @@ export function ParticleMorph({
         scene: THREE.Scene
         camera: THREE.PerspectiveCamera
         particles: THREE.Points
+        materialShader?: THREE.Shader // Store shader reference
         basePositions: Float32Array
         targetPositions: Float32Array
         currentTarget: MorphTarget
@@ -34,55 +35,88 @@ export function ParticleMorph({
     // Generate base noise cloud positions
     const generateNoiseCloud = (count: number): Float32Array => {
         const positions = new Float32Array(count * 3)
-        const radius = 2.5
+        // Spread particles across the header area (wide rectangle)
+        const width = 12.0 // Wide dispersion
+        const height = 4.5 // Covers most of vertical height
+        const depth = 2.0 // Slight depth
 
         for (let i = 0; i < count; i++) {
             const i3 = i * 3
-            // Create spherical noise cloud
-            const theta = Math.random() * Math.PI * 2
-            const phi = Math.acos(2 * Math.random() - 1)
-            const r = Math.pow(Math.random(), 0.7) * radius
-
-            positions[i3] = r * Math.sin(phi) * Math.cos(theta)
-            positions[i3 + 1] = r * Math.sin(phi) * Math.sin(theta)
-            positions[i3 + 2] = r * Math.cos(phi)
+            positions[i3] = (Math.random() - 0.5) * width
+            positions[i3 + 1] = (Math.random() - 0.5) * height
+            positions[i3 + 2] = (Math.random() - 0.5) * depth
         }
 
         return positions
     }
 
-    // Generate flask shape (lab flask)
-    const generateFlask = (count: number): Float32Array => {
+    // Generate atom shape (refined based on user image - 3D Rutherford model)
+    const generateAtom = (count: number): Float32Array => {
         const positions = new Float32Array(count * 3)
 
-        for (let i = 0; i < count; i++) {
-            const i3 = i * 3
-            const t = i / count
+        // Particle distribution - roughly 15% for nucleus, rest for orbits
+        const nucleusCount = Math.floor(count * 0.15)
+        const orbitalCount = count - nucleusCount
+        const particlesPerOrbit = Math.floor(orbitalCount / 3)
 
-            if (t < 0.2) {
-                // Neck
-                const angle = Math.random() * Math.PI * 2
-                const r = 0.3 + Math.random() * 0.1
-                const y = 1.5 + t * 5
-                positions[i3] = r * Math.cos(angle)
-                positions[i3 + 1] = y
-                positions[i3 + 2] = r * Math.sin(angle)
-            } else {
-                // Body (rounded flask shape)
-                const angle = Math.random() * Math.PI * 2
-                const bodyT = (t - 0.2) / 0.8
-                const y = -1 + bodyT * 2.5
-                const r = Math.sin(bodyT * Math.PI) * 1.5
-                positions[i3] = r * Math.cos(angle) + (Math.random() - 0.5) * 0.1
-                positions[i3 + 1] = y
-                positions[i3 + 2] = r * Math.sin(angle) + (Math.random() - 0.5) * 0.1
+        let pIndex = 0
+
+        // 1. Nucleus (Dense Sphere)
+        for (let i = 0; i < nucleusCount; i++) {
+            const i3 = pIndex * 3
+            // Dense center, fuzzy edges
+            const r = Math.pow(Math.random(), 3) * 0.4
+            const theta = Math.random() * Math.PI * 2
+            const phi = Math.acos(2 * Math.random() - 1)
+
+            positions[i3] = r * Math.sin(phi) * Math.cos(theta)
+            positions[i3 + 1] = r * Math.sin(phi) * Math.sin(theta)
+            positions[i3 + 2] = r * Math.cos(phi)
+            pIndex++
+        }
+
+        // 2. Orbitals (3 Elliptical Rings in 3D)
+        const radius = 2.0
+        const ellipticity = 0.35
+
+        for (let orbit = 0; orbit < 3; orbit++) {
+            const orbitRotation = (orbit * Math.PI * 2) / 3
+
+            for (let i = 0; i < particlesPerOrbit; i++) {
+                if (pIndex >= count) break
+
+                const i3 = pIndex * 3
+                const t = (i / particlesPerOrbit) * Math.PI * 2
+
+                const drift = 0.08
+
+                // Base circle coordinates
+                const cx = radius * Math.cos(t)
+                const cy = radius * Math.sin(t)
+
+                // Tilt (Rotation around Y axis) to create elliptical look with depth
+                const tiltAngle = Math.acos(ellipticity)
+
+                const tiltedX = cx * ellipticity
+                const tiltedY = cy
+                const tiltedZ = cx * Math.sin(tiltAngle)
+
+                // Rotate around Z axis (distribute orbits)
+                const cosRot = Math.cos(orbitRotation)
+                const sinRot = Math.sin(orbitRotation)
+
+                positions[i3] = (tiltedX * cosRot - tiltedY * sinRot) + (Math.random() - 0.5) * drift
+                positions[i3 + 1] = (tiltedX * sinRot + tiltedY * cosRot) + (Math.random() - 0.5) * drift
+                positions[i3 + 2] = tiltedZ + (Math.random() - 0.5) * drift
+
+                pIndex++
             }
         }
 
         return positions
     }
 
-    // Generate camera shape
+    // Generate compact camera shape - more refined and realistic
     const generateCamera = (count: number): Float32Array => {
         const positions = new Float32Array(count * 3)
 
@@ -90,26 +124,48 @@ export function ParticleMorph({
             const i3 = i * 3
             const t = i / count
 
-            if (t < 0.7) {
-                // Body
-                const x = (Math.random() - 0.5) * 2.5
-                const y = (Math.random() - 0.5) * 1.5
-                const z = (Math.random() - 0.5) * 1.8
+            if (t < 0.5) {
+                // Main camera body (compact rectangular body)
+                const x = (Math.random() - 0.5) * 1.8
+                const y = (Math.random() - 0.5) * 1.2
+                const z = (Math.random() - 0.5) * 0.8
                 positions[i3] = x
                 positions[i3 + 1] = y
                 positions[i3 + 2] = z
-            } else if (t < 0.85) {
-                // Lens
+            } else if (t < 0.75) {
+                // Lens (protruding cylinder)
                 const angle = Math.random() * Math.PI * 2
-                const r = 0.5 + Math.random() * 0.3
+                const radiusVariation = Math.random()
+                const r = 0.25 + radiusVariation * 0.35 // Smaller, more focused lens
+                const depth = Math.random() * 0.6
+
                 positions[i3] = r * Math.cos(angle)
-                positions[i3 + 1] = r * Math.sin(angle)
-                positions[i3 + 2] = 1.5 + Math.random() * 0.5
+                positions[i3 + 1] = 0.1 + r * Math.sin(angle) // Slightly offset upward
+                positions[i3 + 2] = 0.5 + depth // Protruding forward
+            } else if (t < 0.85) {
+                // Viewfinder (small rectangular prism on top)
+                const x = -0.4 + Math.random() * 0.4
+                const y = 0.7 + Math.random() * 0.25
+                const z = -0.2 + Math.random() * 0.3
+                positions[i3] = x
+                positions[i3 + 1] = y
+                positions[i3 + 2] = z
+            } else if (t < 0.93) {
+                // Flash (small rectangle on top left)
+                const x = -0.7 + Math.random() * 0.25
+                const y = 0.65 + Math.random() * 0.2
+                const z = -0.1 + Math.random() * 0.2
+                positions[i3] = x
+                positions[i3 + 1] = y
+                positions[i3 + 2] = z
             } else {
-                // Flash/viewfinder
-                positions[i3] = -0.8 + Math.random() * 0.3
-                positions[i3 + 1] = 0.8 + Math.random() * 0.3
-                positions[i3 + 2] = -0.5 + Math.random() * 0.3
+                // Shutter button and details (top right)
+                const x = 0.5 + Math.random() * 0.3
+                const y = 0.6 + Math.random() * 0.15
+                const z = 0.0 + Math.random() * 0.2
+                positions[i3] = x
+                positions[i3 + 1] = y
+                positions[i3 + 2] = z
             }
         }
 
@@ -223,22 +279,46 @@ export function ParticleMorph({
         return positions
     }
 
-    // Get target positions based on shape
-    const getTargetPositions = (shape: MorphTarget): Float32Array => {
-        switch (shape) {
-            case 'flask':
-                return generateFlask(particleCount)
-            case 'camera':
-                return generateCamera(particleCount)
-            case 'cube':
-                return generateCube(particleCount)
-            case 'palette':
-                return generatePalette(particleCount)
-            case 'plane':
-                return generatePlane(particleCount)
-            default:
-                return generateNoiseCloud(particleCount)
+    // Scale shape positions to match noise cloud size (radius ~2.5)
+    const scaleShapePositions = (positions: Float32Array, scaleFactor: number): Float32Array => {
+        const scaled = new Float32Array(positions.length)
+        for (let i = 0; i < positions.length; i++) {
+            scaled[i] = positions[i] * scaleFactor
         }
+        return scaled
+    }
+
+    // Get target positions based on shape with appropriate particle count
+    const getTargetPositions = (shape: MorphTarget, count: number): Float32Array => {
+        let positions: Float32Array
+        let scaleFactor = 1
+
+        switch (shape) {
+            case 'atom':
+                positions = generateAtom(count)
+                scaleFactor = 2.0 // Atom orbits need scaling to match cloud size
+                break
+            case 'camera':
+                positions = generateCamera(count)
+                scaleFactor = 1.2 // Camera is slightly smaller
+                break
+            case 'cube':
+                positions = generateCube(count)
+                scaleFactor = 1.5 // Cube needs scaling up
+                break
+            case 'palette':
+                positions = generatePalette(count)
+                scaleFactor = 1.0 // Palette is similar size
+                break
+            case 'plane':
+                positions = generatePlane(count)
+                scaleFactor = 1.0 // Plane is similar size
+                break
+            default:
+                return generateNoiseCloud(count)
+        }
+
+        return scaleShapePositions(positions, scaleFactor)
     }
 
     useEffect(() => {
@@ -267,16 +347,72 @@ export function ParticleMorph({
         const basePositions = generateNoiseCloud(particleCount)
         geometry.setAttribute('position', new THREE.BufferAttribute(basePositions, 3))
 
-        // Create particle material
+        // Create particle material with lower base opacity
         const material = new THREE.PointsMaterial({
             size: 0.02,
             color: color,
             transparent: true,
-            opacity: 0.6,
+            opacity: 1.0, // Will be controlled per-particle via attribute
+            vertexColors: false,
             blending: THREE.AdditiveBlending,
             depthWrite: false,
             sizeAttenuation: true,
         })
+
+        // Create opacity array - first 3000 particles more visible, last 3000 very subtle
+        const opacities = new Float32Array(particleCount)
+        for (let i = 0; i < particleCount; i++) {
+            // first 3000: 0.35 opacity, last 3000: 0.08 opacity (very subtle)
+            opacities[i] = i < 3000 ? 0.35 : 0.08
+        }
+        geometry.setAttribute('alpha', new THREE.BufferAttribute(opacities, 1))
+
+        // Enable per-particle opacity and movement
+        material.onBeforeCompile = (shader) => {
+            // Save shader to ref for uniform updates
+            if (sceneRef.current) {
+                sceneRef.current.materialShader = shader
+            }
+
+            shader.uniforms.uTime = { value: 0 }
+            shader.uniforms.uNoiseStrength = { value: 1 }
+
+            shader.vertexShader = 'uniform float uTime;\nuniform float uNoiseStrength;\n' + shader.vertexShader
+
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <color_pars_vertex>',
+                '#include <color_pars_vertex>\nattribute float alpha;\nvarying float vAlpha;'
+            )
+
+            // Add internal movement to particles
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <begin_vertex>',
+                `
+                #include <begin_vertex>
+                
+                // Add gentle wandering motion
+                float t = uTime * 0.5;
+                float noiseX = sin(position.y * 2.0 + t) * 0.1 + cos(position.z * 1.0 + t * 0.5) * 0.05;
+                float noiseY = cos(position.x * 2.0 + t) * 0.1 + sin(position.z * 1.0 + t * 0.5) * 0.05;
+                float noiseZ = sin(position.x * 1.0 + t) * 0.05 + cos(position.y * 1.0 + t * 0.3) * 0.05;
+                
+                transformed += vec3(noiseX, noiseY, noiseZ) * uNoiseStrength;
+                `
+            )
+
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <color_vertex>',
+                '#include <color_vertex>\nvAlpha = alpha;'
+            )
+            shader.fragmentShader = shader.fragmentShader.replace(
+                '#include <color_pars_fragment>',
+                '#include <color_pars_fragment>\nvarying float vAlpha;'
+            )
+            shader.fragmentShader = shader.fragmentShader.replace(
+                'vec4 diffuseColor = vec4( diffuse, opacity );',
+                'vec4 diffuseColor = vec4( diffuse, opacity * vAlpha );'
+            )
+        }
 
         const particles = new THREE.Points(geometry, material)
         scene.add(particles)
@@ -296,6 +432,9 @@ export function ParticleMorph({
 
         // Animation loop
         let lastTime = performance.now()
+        let currentRotationSpeed = 0
+        let currentNoiseStrength = 1
+
         const animate = () => {
             if (!sceneRef.current) return
 
@@ -303,28 +442,80 @@ export function ParticleMorph({
             const deltaTime = (currentTime - lastTime) / 1000
             lastTime = currentTime
 
+            // Determine target states based on shape
+            const isDefault = sceneRef.current.currentTarget === 'default'
+
+            // Shapes rotate, default doesn't
+            const targetRotationSpeed = isDefault ? 0 : 0.1
+            // Default has noise, shapes don't (to preserve shape clarity)
+            const targetNoiseStrength = isDefault ? 1.0 : 0.0
+
+            // Smoothly interpolate values
+            currentRotationSpeed += (targetRotationSpeed - currentRotationSpeed) * deltaTime * 2.0
+            currentNoiseStrength += (targetNoiseStrength - currentNoiseStrength) * deltaTime * 2.0
+
+            // Update shader uniforms
+            if (sceneRef.current.materialShader) {
+                sceneRef.current.materialShader.uniforms.uTime.value = currentTime * 0.001
+                sceneRef.current.materialShader.uniforms.uNoiseStrength.value = currentNoiseStrength
+            }
+
             // Smooth animation progress
             if (sceneRef.current.animationProgress < 1) {
                 sceneRef.current.animationProgress = Math.min(
                     1,
-                    sceneRef.current.animationProgress + deltaTime * 1.5
+                    sceneRef.current.animationProgress + deltaTime * 1.2
                 )
 
                 // Interpolate positions
                 const positions = sceneRef.current.particles.geometry.attributes.position.array as Float32Array
+                const opacities = sceneRef.current.particles.geometry.attributes.alpha.array as Float32Array
                 const ease = easeInOutCubic(sceneRef.current.animationProgress)
 
-                for (let i = 0; i < particleCount * 3; i++) {
-                    positions[i] = sceneRef.current.basePositions[i] +
-                        (sceneRef.current.targetPositions[i] - sceneRef.current.basePositions[i]) * ease
+                // Define target opacities based on current target
+                const isShape = sceneRef.current.currentTarget !== 'default'
+
+                for (let i = 0; i < particleCount; i++) {
+                    // Position interpolation
+                    const i3 = i * 3
+                    positions[i3] = sceneRef.current.basePositions[i3] +
+                        (sceneRef.current.targetPositions[i3] - sceneRef.current.basePositions[i3]) * ease
+                    positions[i3 + 1] = sceneRef.current.basePositions[i3 + 1] +
+                        (sceneRef.current.targetPositions[i3 + 1] - sceneRef.current.basePositions[i3 + 1]) * ease
+                    positions[i3 + 2] = sceneRef.current.basePositions[i3 + 2] +
+                        (sceneRef.current.targetPositions[i3 + 2] - sceneRef.current.basePositions[i3 + 2]) * ease
+
+                    // Opacity interpolation
+                    const baseOpacity = i < 3000 ? 0.35 : 0.08
+                    const shapeOpacity = i < 3000 ? 0.55 : 0.45 // Higher opacity for shapes
+                    const targetOpacity = isShape ? shapeOpacity : baseOpacity
+
+                    opacities[i] = opacities[i] + (targetOpacity - opacities[i]) * ease * 0.3
                 }
 
                 sceneRef.current.particles.geometry.attributes.position.needsUpdate = true
+                sceneRef.current.particles.geometry.attributes.alpha.needsUpdate = true
             }
 
-            // Gentle rotation
-            sceneRef.current.particles.rotation.y += deltaTime * 0.1
-            sceneRef.current.particles.rotation.x = Math.sin(currentTime * 0.0003) * 0.1
+            // Apply rotation
+            if (isDefault) {
+                // Smoothly return to nearest aligned rotation (0, 180, 360, etc.)
+                // This ensures the wide cloud faces the camera without spinning back wildly
+                const currentRot = sceneRef.current.particles.rotation.y
+                const targetRot = Math.round(currentRot / Math.PI) * Math.PI
+
+                // Interpolate towards the nearest flat angle
+                sceneRef.current.particles.rotation.y += (targetRot - currentRot) * deltaTime * 2.0
+
+                // Return to 0 tilt
+                sceneRef.current.particles.rotation.x *= 0.95
+            } else {
+                // Continually rotate for shapes
+                sceneRef.current.particles.rotation.y += currentRotationSpeed * deltaTime
+
+                // Slight tilt effect for 3D feel
+                sceneRef.current.particles.rotation.x = Math.sin(currentTime * 0.0003) * 0.1
+            }
 
             renderer.render(scene, camera)
             sceneRef.current.frameId = requestAnimationFrame(animate)
@@ -357,11 +548,14 @@ export function ParticleMorph({
         }
     }, [particleCount])
 
-    // Handle target changes
+    // Handle target changes - simple position morphing with fixed particle count
     useEffect(() => {
         if (!sceneRef.current) return
 
-        const newTarget = getTargetPositions(target)
+        // Generate target positions (always use 6000 particles)
+        const newTarget = getTargetPositions(target, particleCount)
+
+        // Sync base positions with current state
         sceneRef.current.basePositions = sceneRef.current.particles.geometry.attributes.position.array.slice() as Float32Array
         sceneRef.current.targetPositions = newTarget
         sceneRef.current.currentTarget = target
@@ -384,9 +578,10 @@ export function ParticleMorph({
     )
 }
 
-// Easing function for smooth animations
+// Easing function for smooth animations - quintic for very smooth start and end
 function easeInOutCubic(t: number): number {
+    // Quintic easing (t^5) - much smoother than cubic
     return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2
+        ? 16 * t * t * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 5) / 2
 }

@@ -53,7 +53,7 @@ export function Navbar() {
 
     const navItems = [
         { label: 'Product', href: '/', morphTarget: 'cube' as MorphTarget },
-        { label: 'Experiments', href: '/experiments', morphTarget: 'flask' as MorphTarget },
+        { label: 'Experiments', href: '/experiments', morphTarget: 'atom' as MorphTarget },
         { label: 'Photography', href: '/photography', morphTarget: 'camera' as MorphTarget },
         { label: 'Collection', href: '/curation', morphTarget: 'palette' as MorphTarget },
         { label: isStuck ? 'Osman Köycü' : 'About Me', href: '/about', morphTarget: 'plane' as MorphTarget },

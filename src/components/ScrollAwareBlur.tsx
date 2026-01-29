@@ -29,7 +29,7 @@ export function ScrollAwareBlur() {
             preset="page-footer"
             strength={1}
             zIndex={49}
-            height={isScrolled ? "10vh" : "5vh"}
+            height={isScrolled ? "10vh" : "4vh"}
             style={{ transition: 'height 0.5s ease-in-out' }}
         />
     )

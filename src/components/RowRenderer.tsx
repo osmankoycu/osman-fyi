@@ -90,8 +90,8 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                 const animationProps: any = isFirst ? {} : {
                     initial: { opacity: 0 },
                     whileInView: { opacity: 1 },
-                    viewport: { once: true, amount: 0.3 },
-                    transition: { duration: 1.2, ease: "easeInOut" }
+                    viewport: { once: true, amount: 0.1, margin: "200px" },
+                    transition: { duration: 0.8, ease: "easeInOut" }
                 }
 
                 if ('_type' in row && row._type === 'packed-pair') {
@@ -101,14 +101,24 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                             {/* Row A: Large - Small */}
                             <motion.div
                                 {...animationProps}
-                                className="grid grid-cols-1 min-[1440px]:grid-cols-[2fr_1fr] gap-[2px] w-full"
+                                className="grid grid-cols-1 min-[1440px]:grid-cols-[2fr_1fr] gap-[2px] w-full will-change-opacity"
                             >
                                 <div className={clsx("w-full relative", aspectClass)}>
-                                    <ItemRenderer item={row.rowA.primary} className="absolute inset-0 w-full h-full" fillContainer />
+                                    <ItemRenderer
+                                        item={row.rowA.primary}
+                                        className="absolute inset-0 w-full h-full"
+                                        fillContainer
+                                        sizes="(max-width: 1440px) 100vw, 66vw"
+                                    />
                                 </div>
                                 <div className={clsx("w-full relative min-[1440px]:aspect-auto", aspectClass)}>
                                     {/* Double item matches height of sibling in grid, but needs object-cover */}
-                                    <ItemRenderer item={row.rowA.secondary} className="absolute inset-0 w-full h-full" fillContainer />
+                                    <ItemRenderer
+                                        item={row.rowA.secondary}
+                                        className="absolute inset-0 w-full h-full"
+                                        fillContainer
+                                        sizes="(max-width: 1440px) 100vw, 33vw"
+                                    />
                                 </div>
                             </motion.div>
 
@@ -116,15 +126,25 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
-                                viewport={{ once: true, amount: 0.3 }}
-                                transition={{ duration: 1.2, ease: "easeInOut" }}
-                                className="grid grid-cols-1 min-[1440px]:grid-cols-[1fr_2fr] gap-[2px] w-full"
+                                viewport={{ once: true, amount: 0.1, margin: "200px" }}
+                                transition={{ duration: 0.8, ease: "easeInOut" }}
+                                className="grid grid-cols-1 min-[1440px]:grid-cols-[1fr_2fr] gap-[2px] w-full will-change-opacity"
                             >
                                 <div className={clsx("w-full relative min-[1440px]:aspect-auto", aspectClass)}>
-                                    <ItemRenderer item={row.rowB.primary} className="absolute inset-0 w-full h-full" fillContainer />
+                                    <ItemRenderer
+                                        item={row.rowB.primary}
+                                        className="absolute inset-0 w-full h-full"
+                                        fillContainer
+                                        sizes="(max-width: 1440px) 100vw, 33vw"
+                                    />
                                 </div>
                                 <div className={clsx("w-full relative", aspectClass)}>
-                                    <ItemRenderer item={row.rowB.secondary} className="absolute inset-0 w-full h-full" fillContainer />
+                                    <ItemRenderer
+                                        item={row.rowB.secondary}
+                                        className="absolute inset-0 w-full h-full"
+                                        fillContainer
+                                        sizes="(max-width: 1440px) 100vw, 66vw"
+                                    />
                                 </div>
                             </motion.div>
                         </React.Fragment>
@@ -140,13 +160,17 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                 return (
                     <motion.section
                         key={standardRow._key}
-                        className="w-full"
+                        className="w-full will-change-opacity"
                         style={{ backgroundColor: standardRow.backgroundColor }}
                         {...animationProps}
                     >
                         {standardRow.layout === 'full' && (
                             <div className={clsx("w-full relative", aspectClass)}>
-                                <ItemRenderer item={standardRow.items[0]} className="absolute inset-0 w-full h-full" />
+                                <ItemRenderer
+                                    item={standardRow.items[0]}
+                                    className="absolute inset-0 w-full h-full"
+                                    sizes="100vw"
+                                />
                             </div>
                         )}
 
@@ -183,6 +207,7 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                                                     className="w-full h-full object-cover absolute inset-0"
                                                     fillContainer
                                                     objectFit={isWide ? 'contain' : undefined}
+                                                    sizes="(max-width: 768px) 100vw, 50vw"
                                                 />
                                             </div>
                                         ))}
@@ -205,8 +230,8 @@ interface PackedRowPair {
     rowB: { primary: RowItem; secondary: RowItem; layout: 'small-large'; _key: string }
 }
 
-function ItemRenderer({ item, className, fillContainer, objectFit }: { item: RowItem, className?: string, fillContainer?: boolean, objectFit?: 'cover' | 'contain' }) {
-    if (item._type === 'imageCard') return <ImageCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} />
+function ItemRenderer({ item, className, fillContainer, objectFit, sizes }: { item: RowItem, className?: string, fillContainer?: boolean, objectFit?: 'cover' | 'contain', sizes?: string }) {
+    if (item._type === 'imageCard') return <ImageCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} sizes={sizes} />
     if (item._type === 'textCard') return <TextCard {...item} className={className} />
     if (item._type === 'videoCard') return <VideoCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} />
     return null

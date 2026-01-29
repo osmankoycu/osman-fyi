@@ -12,9 +12,10 @@ interface ImageCardProps extends ImageCardData {
     layout?: 'full' | 'two'
     fillContainer?: boolean
     objectFit?: 'cover' | 'contain'
+    sizes?: string
 }
 
-export function ImageCard({ image, alt, caption, className, backgroundColor, mobileHeightClass, layout = 'full', fillContainer, objectFit }: ImageCardProps) {
+export function ImageCard({ image, alt, caption, className, backgroundColor, mobileHeightClass, layout = 'full', fillContainer, objectFit, sizes }: ImageCardProps) {
     const pathname = usePathname()
     const isPhotography = pathname === '/photography'
 
@@ -47,7 +48,7 @@ export function ImageCard({ image, alt, caption, className, backgroundColor, mob
                     alt={alt || 'Project Image'}
                     fill
                     className={objectFitClass}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1920px"
+                    sizes={sizes || "(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1920px"}
                 />
                 {((backgroundColor === 'white' || backgroundColor?.toLowerCase() === '#ffffff')) && (
                     <div className="absolute inset-0 border border-black/10 mix-blend-multiply pointer-events-none rounded-lg" />

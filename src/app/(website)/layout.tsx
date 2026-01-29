@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { ThemeRegistry } from '@/components/ThemeRegistry'
 import { SmoothScroll } from '@/components/SmoothScroll'
+import { ScrollAwareBlur } from '@/components/ScrollAwareBlur'
 
 export const metadata: Metadata = {
     title: 'Osman Köycü',
@@ -51,6 +52,7 @@ export default function RootLayout({
                     {children}
                 </main>
                 <Footer />
+                <ScrollAwareBlur />
             </body>
         </html>
     )

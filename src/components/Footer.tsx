@@ -8,7 +8,7 @@ export function Footer() {
     const isDark = pathname === '/photography'
 
     return (
-        <footer className="w-full mt-8 md:mt-16 pb-10">
+        <footer className="w-full mt-8 md:mt-16 pb-[12vh]">
             <div className="container-text flex justify-center text-center">
                 <div className={clsx(
                     "text-[20px] md:text-[18px] font-bold",

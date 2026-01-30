@@ -2,9 +2,12 @@
 
 import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
+import { ParticleMorph, type MorphTarget } from './ParticleMorph'
+import { useParticleMorph } from '../contexts/ParticleMorphContext'
 
 export function Header() {
     const pathname = usePathname()
+    const { currentTarget } = useParticleMorph()
 
     const getContent = () => {
         switch (pathname) {
@@ -43,11 +46,15 @@ export function Header() {
     const content = getContent()
 
     const isDark = pathname === '/photography'
+    const particleColor = isDark ? 0xffffff : 0x000000
 
     return (
-        <header className="container-text h-[calc(100dvh-210px)] mb-12 flex flex-col justify-center items-center text-center !px-[30px] md:!px-4">
+        <header className="relative container-text h-[calc(100dvh-210px)] mb-12 flex flex-col justify-center items-center text-center !px-[30px] md:!px-4 overflow-visible">
+            {/* Particle background */}
+            <ParticleMorph target={currentTarget} color={particleColor} isVisible={true} />
+
             <h1 className={clsx(
-                "text-[28px] md:text-[32px] leading-[34px] md:leading-[42px] mb-6 md:mb-8 max-w-[900px]",
+                "text-[28px] md:text-[32px] leading-[34px] md:leading-[42px] mb-6 md:mb-8 max-w-[900px] relative z-10",
                 isDark ? "text-white" : "text-black"
             )}>
                 <span className="font-bold">

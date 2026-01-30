@@ -1430,8 +1430,14 @@ export function ParticleMorph({
                 // Yaw (Y): Coupled with Roll for realism
                 // We add roll * 0.5 to yaw to simulate banking turn logic
                 sceneRef.current.particles.rotation.y = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
-                // We add roll * 0.5 to yaw to simulate banking turn logic
-                sceneRef.current.particles.rotation.y = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
+            } else if (isScissors) {
+                // Scissors Animation: Rotate 360 around Z axis (Vertical <-> Horizontal)
+                // Spin around the center (screen plane)
+                sceneRef.current.particles.rotation.z += currentRotationSpeed * deltaTime
+
+                // Reset other axes
+                sceneRef.current.particles.rotation.x = 0
+                sceneRef.current.particles.rotation.y = 0
             } else if (!isCamera) { // Don't rotate camera here, it has its own logic
                 // Continually rotate for other shapes
                 sceneRef.current.particles.rotation.y += currentRotationSpeed * deltaTime

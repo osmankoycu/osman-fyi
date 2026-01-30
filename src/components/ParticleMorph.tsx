@@ -1432,8 +1432,8 @@ export function ParticleMorph({
                 sceneRef.current.particles.rotation.y = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
             } else if (isScissors) {
                 // Scissors Animation: Rotate 360 around Z axis (Vertical <-> Horizontal)
-                // Spin around the center (screen plane)
-                sceneRef.current.particles.rotation.z += currentRotationSpeed * deltaTime
+                // Spin around the center (screen plane) - FASTER
+                sceneRef.current.particles.rotation.z += currentRotationSpeed * 2.5 * deltaTime
 
                 // Reset other axes
                 sceneRef.current.particles.rotation.x = 0

@@ -3,7 +3,7 @@
 import { useRef, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 
-export type MorphTarget = 'default' | 'atom' | 'camera' | 'cube' | 'collection' | 'palette' | 'plane'
+export type MorphTarget = 'default' | 'atom' | 'camera' | 'cube' | 'curation' | 'palette' | 'plane'
 
 interface ParticleMorphProps {
     target?: MorphTarget
@@ -526,7 +526,7 @@ export function ParticleMorph({
                 positions = generateCube(count)
                 scaleFactor = 1.5 // Cube needs scaling up
                 break
-            case 'collection':
+            case 'curation':
                 positions = generateScissors(count)
                 scaleFactor = 1.2 // Size adjustment
                 break
@@ -670,7 +670,7 @@ export function ParticleMorph({
             const isDefault = sceneRef.current.currentTarget === 'default'
             const isAtom = sceneRef.current.currentTarget === 'atom'
             const isCube = sceneRef.current.currentTarget === 'cube'
-            const isScissors = sceneRef.current.currentTarget === 'collection'
+            const isScissors = sceneRef.current.currentTarget === 'curation'
 
             // Shapes rotate, default doesn't
             const targetRotationSpeed = isDefault ? 0 : 0.1

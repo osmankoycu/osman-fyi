@@ -3,7 +3,7 @@
 import { useRef, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 
-export type MorphTarget = 'default' | 'atom' | 'camera' | 'cube' | 'curation' | 'palette' | 'plane'
+export type MorphTarget = 'default' | 'atom' | 'camera' | 'cube' | 'curation' | 'palette' | 'plane' | 'hand'
 
 interface ParticleMorphProps {
     target?: MorphTarget
@@ -57,6 +57,155 @@ export function ParticleMorph({
             positions[i3 + 1] = (Math.random() - 0.5) * height
             positions[i3 + 2] = (Math.random() - 0.5) * depth
         }
+
+        return positions
+    }
+
+    // Generate waving hand shape
+    const generateHand = (count: number): Float32Array => {
+        const positions = new Float32Array(count * 3)
+
+        // Distribution: Palm 40%, Wrist 10%, Fingers 50%
+        const palmCount = Math.floor(count * 0.4)
+        const wristCount = Math.floor(count * 0.1)
+        const fingerCount = Math.floor((count - palmCount - wristCount) / 5)
+
+        let pIndex = 0
+
+        // 1. Palm (Rounded Box / Squircle)
+        for (let i = 0; i < palmCount; i++) {
+            const i3 = pIndex * 3
+
+            // Rejection sampling for rounded corners
+            // Box default: x:[-0.8, 0.8], y:[-0.75, 0.75]
+            let x, y, z
+            let valid = false
+            while (!valid) {
+                x = (Math.random() - 0.5) * 1.6
+                y = (Math.random() - 0.5) * 1.5
+
+                // Apply rounding to corners
+                // Normalized coordinates relative to corner starts
+                // Let's say corners start at x=+-0.5, y=+-0.5
+                const ax = Math.abs(x)
+                const ay = Math.abs(y)
+
+                // Bottom corners (connect to wrist) - allow more rounding aka taper
+                if (y < -0.4) {
+                    // Determine max width at this y to shape into wrist
+                    // Wrist radius is ~0.6, so at y=-0.75 width should be ~1.2 (radius 0.6)
+                    // Elliptical rounding for bottom corners
+                    // x^2 / 0.8^2 + (y+0.4)^2 / 0.35^2 ... maybe too complex
+
+                    // Simple corner check:
+                    // If both x and y are far out
+                    const cornerX = 0.5
+                    const cornerY = 0.4 // relative to bottom edge
+
+                    if (ax > 0.5 && y < -0.5) {
+                        const dx = ax - 0.5
+                        const dy = -0.5 - y // positive distance from -0.5 line downwards
+                        // Check elliptical corner
+                        if ((dx * dx) / (0.3 * 0.3) + (dy * dy) / (0.25 * 0.25) > 1) {
+                            if (Math.random() > 0.1) continue; // Retry mostly, allow some fuzz
+                        }
+                    }
+                }
+
+                // General rounding for all corners (fuzzier box)
+                if (Math.pow(x / 0.8, 4) + Math.pow(y / 0.75, 4) > 1.1) {
+                    // Reject points in the sharp corners of the superellipse
+                    continue
+                }
+
+                valid = true
+            }
+
+            // Soften edges: Depth (z) should taper off at the edges of the palm (ellipsoid-ish profile)
+            // Normalized distance from center (approx)
+            const nx = x! / 0.8
+            const ny = y! / 0.75
+            const distSq = nx * nx + ny * ny
+
+            // Base thickness 0.5, thinning edge factor
+            // Create a "pill" shape profile
+            const thicknessFactor = Math.sqrt(Math.max(0, 1 - distSq * 0.6)) // Don't go to zero, perfectly flat hands are weird. Keep some edge thickness.
+
+            z = (Math.random() - 0.5) * 0.5 * thicknessFactor
+
+            positions[i3] = x!
+            positions[i3 + 1] = y!
+            positions[i3 + 2] = z
+            pIndex++
+        }
+
+        // 2. Wrist (Cylinder at bottom)
+        for (let i = 0; i < wristCount; i++) {
+            const i3 = pIndex * 3
+            const angle = Math.random() * Math.PI * 2
+            const r = 0.6 * Math.sqrt(Math.random())
+            const h = Math.random() * 0.8
+
+            positions[i3] = r * Math.cos(angle)
+            positions[i3 + 1] = -0.75 - h
+            positions[i3 + 2] = r * Math.sin(angle)
+            pIndex++
+        }
+
+        // 3. Fingers
+        const fingerSpecs = [
+            { x: -0.8, y: -0.3, ang: 0.5, len: 1.0, w: 0.38 }, // Thumb - Thicker
+            { x: -0.6, y: 0.75, ang: 0.1, len: 1.1, w: 0.30 }, // Index
+            { x: -0.2, y: 0.8, ang: 0, len: 1.25, w: 0.32 },   // Middle
+            { x: 0.2, y: 0.75, ang: -0.05, len: 1.15, w: 0.30 }, // Ring
+            { x: 0.6, y: 0.65, ang: -0.15, len: 0.9, w: 0.26 }   // Pinky
+        ]
+
+        fingerSpecs.forEach((f, idx) => {
+            const currentLimit = (idx === 4) ? count - pIndex : fingerCount
+
+            for (let j = 0; j < currentLimit; j++) {
+                if (pIndex >= count) break
+                const i3 = pIndex * 3
+
+                const t = Math.random()
+                let widthScale = 1.0 // Initialize widthScale
+
+                if (t > 0.85) {
+                    const tipT = (t - 0.85) / 0.15
+                    // Circular rounding profile for tip
+                    widthScale = Math.sqrt(1 - tipT * tipT)
+                }
+
+                // Finger geometry: Cylinder (Round Cross-Section)
+                // Random angle for the cylinder
+                const theta = Math.random() * Math.PI * 2
+                // Random radius (sqrt for uniform distribution in circle)
+                // Width 'w' is diameter, so radius is w/2
+                // Add some "fuzz" to radius to fill volume? No, standard solid cylinder is clear enough.
+                const r = (f.w / 2) * Math.sqrt(Math.random()) * widthScale
+
+                // Local cylinder coords (before finger rotation)
+                // Axis is Y (along length). Cross section is XZ
+                const cylX = r * Math.cos(theta)
+                const cylZ = r * Math.sin(theta)
+                const cylY = t * f.len
+
+                // Rotate finger to correct angle
+                const cos = Math.cos(f.ang)
+                const sin = Math.sin(f.ang)
+
+                // Rotate around Z axis (tilting the finger)
+                const rx = cylX * cos - cylY * sin
+                const ry = cylX * sin + cylY * cos
+
+                // Add positions + base offset
+                positions[i3] = f.x + rx
+                positions[i3 + 1] = f.y + ry
+                positions[i3 + 2] = cylZ
+                pIndex++
+            }
+        })
 
         return positions
     }
@@ -538,6 +687,10 @@ export function ParticleMorph({
                 positions = generatePlane(count)
                 scaleFactor = 1.0 // Plane is similar size
                 break
+            case 'hand':
+                positions = generateHand(count)
+                scaleFactor = 1.1
+                break
             default:
                 return generateNoiseCloud(count)
         }
@@ -671,9 +824,10 @@ export function ParticleMorph({
             const isAtom = sceneRef.current.currentTarget === 'atom'
             const isCube = sceneRef.current.currentTarget === 'cube'
             const isScissors = sceneRef.current.currentTarget === 'curation'
+            const isHand = sceneRef.current.currentTarget === 'hand'
 
             // Shapes rotate, default doesn't
-            const targetRotationSpeed = isDefault ? 0 : 0.1
+            const targetRotationSpeed = isDefault || isHand ? 0 : 0.1
             // Default has noise, shapes don't (to preserve shape clarity)
             const targetNoiseStrength = isDefault ? 1.0 : 0.0
 
@@ -945,8 +1099,23 @@ export function ParticleMorph({
                 // Interpolate towards the nearest flat angle
                 sceneRef.current.particles.rotation.y += (targetRot - currentRot) * deltaTime * 2.0
 
-                // Return to 0 tilt
+                // Return to 0 tilt (X and Z)
                 sceneRef.current.particles.rotation.x *= 0.95
+                sceneRef.current.particles.rotation.z *= 0.95
+            } else if (isHand) {
+                // Waving animation for hand
+
+                // 1. Vertical 3D Rotation (Y-Axis Swivel)
+                // Rotates the hand left and right to show 3D depth ("dikeyde 3d rotate")
+                sceneRef.current.particles.rotation.y = Math.sin(currentTime * 0.0015) * 0.6
+
+                // 2. Tie Z-Axis Wave to Y-Rotation for natural feel?
+                // Or keep independent. Independent is fine.
+                const waveAngle = Math.sin(currentTime * 0.004) * 0.25 // +/- ~15 degrees
+                sceneRef.current.particles.rotation.z = waveAngle
+
+                // 3. Slight X-Axis breathing
+                sceneRef.current.particles.rotation.x = Math.sin(currentTime * 0.001) * 0.05
             } else {
                 // Continually rotate for shapes
                 sceneRef.current.particles.rotation.y += currentRotationSpeed * deltaTime
@@ -991,7 +1160,12 @@ export function ParticleMorph({
         if (!sceneRef.current) return
 
         // Generate target positions (always use 6000 particles)
+        console.log('ParticleMorph: target changed to', target)
         const newTarget = getTargetPositions(target, particleCount)
+
+        if (target === 'curation') {
+            console.log('ParticleMorph: generated curation/scissors data', sceneRef.current.scissorsData)
+        }
 
         // Sync base positions with current state
         sceneRef.current.basePositions = sceneRef.current.particles.geometry.attributes.position.array.slice() as Float32Array

@@ -56,7 +56,7 @@ export function Navbar() {
         { label: 'Experiments', href: '/experiments', morphTarget: 'atom' as MorphTarget },
         { label: 'Photography', href: '/photography', morphTarget: 'camera' as MorphTarget },
         { label: 'Curation', href: '/curation', morphTarget: 'curation' as MorphTarget },
-        { label: isStuck ? 'Osman Köycü' : 'About Me', href: '/about', morphTarget: 'plane' as MorphTarget },
+        { label: isStuck ? 'Osman Köycü' : 'About Me', href: '/about', morphTarget: 'hand' as MorphTarget },
         { label: 'Email', href: 'mailto:osmankoycu@gmail.com', morphTarget: 'default' as MorphTarget },
     ]
 

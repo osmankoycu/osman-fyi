@@ -41,6 +41,10 @@ export function ParticleMorph({
         scissorsData?: {
             armIndices: Int8Array // 0 for Left Arm (Blade+Handle), 1 for Right Arm
         }
+        cameraData?: {
+            shutterIndices: Int8Array // 1 for shutter button, 0 for other parts
+            baseShutterPositions?: Float32Array // Store base positions for animation
+        }
     } | null>(null)
 
     // Generate base noise cloud positions
@@ -515,57 +519,167 @@ export function ParticleMorph({
         return positions
     }
 
-    // Generate compact camera shape - more refined and realistic
+    // Generate simple geometric camera - rounded rectangle with subtle edges
     const generateCamera = (count: number): Float32Array => {
         const positions = new Float32Array(count * 3)
+        // Store camera data for shutter button animation
+        const cameraData = sceneRef.current ? {
+            shutterIndices: new Int8Array(count)
+        } : null
+
+        if (cameraData) cameraData.shutterIndices.fill(0) // Default: not shutter
 
         for (let i = 0; i < count; i++) {
             const i3 = i * 3
             const t = i / count
 
-            if (t < 0.5) {
-                // Main camera body (compact rectangular body)
-                const x = (Math.random() - 0.5) * 1.8
-                const y = (Math.random() - 0.5) * 1.2
-                const z = (Math.random() - 0.5) * 0.8
-                positions[i3] = x
-                positions[i3 + 1] = y
-                positions[i3 + 2] = z
-            } else if (t < 0.75) {
-                // Lens (protruding cylinder)
-                const angle = Math.random() * Math.PI * 2
-                const radiusVariation = Math.random()
-                const r = 0.25 + radiusVariation * 0.35 // Smaller, more focused lens
-                const depth = Math.random() * 0.6
+            if (t < 0.6) {
+                // Camera body - HYBRID: SURFACE SHELL + VOLUME
+                // This creates a defined shape like the product box, but solid inside
 
+                const width = 1.8
+                const height = 1.0
+                const depth = 0.35
+                const cornerRadius = 0.08
+
+                const isSurface = Math.random() < 0.55 // 55% Surface (defined shape), 45% Volume (solid fill)
+
+                let x, y, z;
+                let valid = false;
+                let attempts = 0;
+
+                while (!valid && attempts < 15) {
+                    attempts++;
+
+                    if (isSurface) {
+                        // Generate point on the SURFACE (Shell)
+                        const face = Math.random();
+
+                        if (face < 0.4) { // Front Face
+                            x = (Math.random() - 0.5) * width;
+                            y = (Math.random() - 0.5) * height;
+                            z = depth / 2;
+                        } else if (face < 0.8) { // Back Face
+                            x = (Math.random() - 0.5) * width;
+                            y = (Math.random() - 0.5) * height;
+                            z = -depth / 2;
+                        } else { // Sides (Rim)
+                            const side = Math.floor(Math.random() * 4); // 0=Top, 1=Right, 2=Bottom, 3=Left
+                            if (side === 0) { // Top
+                                x = (Math.random() - 0.5) * width;
+                                y = height / 2;
+                                z = (Math.random() - 0.5) * depth;
+                            } else if (side === 1) { // Right
+                                x = width / 2;
+                                y = (Math.random() - 0.5) * height;
+                                z = (Math.random() - 0.5) * depth;
+                            } else if (side === 2) { // Bottom
+                                x = (Math.random() - 0.5) * width;
+                                y = -height / 2;
+                                z = (Math.random() - 0.5) * depth;
+                            } else { // Left
+                                x = -width / 2;
+                                y = (Math.random() - 0.5) * height;
+                                z = (Math.random() - 0.5) * depth;
+                            }
+                        }
+                    } else {
+                        // Generate point in the VOLUME (Interior)
+                        x = (Math.random() - 0.5) * width;
+                        y = (Math.random() - 0.5) * height;
+                        z = (Math.random() - 0.5) * depth;
+                    }
+
+                    // Apply Rounded Corner Logic
+                    const absX = Math.abs(x!);
+                    const absY = Math.abs(y!);
+                    const xCornerStart = width / 2 - cornerRadius;
+                    const yCornerStart = height / 2 - cornerRadius;
+
+                    if (absX > xCornerStart && absY > yCornerStart) {
+                        // In a corner region
+                        const xDist = absX - xCornerStart;
+                        const yDist = absY - yCornerStart;
+
+                        // Check if outside rounded corner
+                        if (xDist * xDist + yDist * yDist > cornerRadius * cornerRadius) {
+                            valid = false; // Outside, retry
+                            continue;
+                        }
+
+                        // If surface point in corner, snap to curve
+                        if (isSurface && Math.abs(z!) < depth / 2) {
+                            const angle = Math.atan2(yDist, xDist);
+                            const newDist = cornerRadius;
+
+                            const signX = x! > 0 ? 1 : -1;
+                            const signY = y! > 0 ? 1 : -1;
+
+                            x = (xCornerStart + newDist * Math.cos(angle)) * signX;
+                            y = (yCornerStart + newDist * Math.sin(angle)) * signY;
+                        }
+                    }
+
+                    valid = true;
+                }
+
+                positions[i3] = x!;
+                positions[i3 + 1] = y!;
+                positions[i3 + 2] = z!;
+            } else if (t < 0.64) {
+                // Lens BASE - flush with camera body (attachment ring)
+                const angle = Math.random() * Math.PI * 2
+                const r = 0.38 + Math.random() * 0.05 // Base ring radius
                 positions[i3] = r * Math.cos(angle)
-                positions[i3 + 1] = 0.1 + r * Math.sin(angle) // Slightly offset upward
-                positions[i3 + 2] = 0.5 + depth // Protruding forward
-            } else if (t < 0.85) {
-                // Viewfinder (small rectangular prism on top)
-                const x = -0.4 + Math.random() * 0.4
-                const y = 0.7 + Math.random() * 0.25
-                const z = -0.2 + Math.random() * 0.3
-                positions[i3] = x
-                positions[i3 + 1] = y
-                positions[i3 + 2] = z
-            } else if (t < 0.93) {
-                // Flash (small rectangle on top left)
-                const x = -0.7 + Math.random() * 0.25
-                const y = 0.65 + Math.random() * 0.2
-                const z = -0.1 + Math.random() * 0.2
+                positions[i3 + 1] = r * Math.sin(angle)
+                positions[i3 + 2] = 0.175 + Math.random() * 0.05 // Starts at camera edge
+            } else if (t < 0.74) {
+                // Lens APERTURE (Diaphragm) - Spiral pattern inside lens
+                const bladeCount = 6 // 6 aperture blades
+                const blade = Math.floor(Math.random() * bladeCount)
+                const param = Math.random()
+
+                // Spiral aperture shape
+                const angleOffset = (blade / bladeCount) * Math.PI * 2
+                const spiralAngle = angleOffset + param * (Math.PI / 1.5) // Curved blade
+                const r = 0.05 + param * 0.28 // From center to edge
+
+                positions[i3] = r * Math.cos(spiralAngle)
+                positions[i3 + 1] = r * Math.sin(spiralAngle)
+                positions[i3 + 2] = 0.25 + param * 0.1 // Slight cone shape inwards
+
+                if (cameraData) cameraData.shutterIndices[i] = 2 // Mark as aperture blade
+            } else if (t < 0.83) {
+                // Lens FRONT - tip ring (connected to middle)
+                const angle = Math.random() * Math.PI * 2
+                const r = 0.34 + Math.random() * 0.06 // Front rim ring
+                positions[i3] = r * Math.cos(angle)
+                positions[i3 + 1] = r * Math.sin(angle)
+                positions[i3 + 2] = 0.52 + Math.random() * 0.04 // Front tip
+            } else if (t < 0.92) {
+                // Rangefinder window - mounted lower on camera body
+                const x = 0.5 + Math.random() * 0.25 // Within camera width
+                const y = 0.15 + Math.random() * 0.2 // Lower position
+                const z = 0.16 + Math.random() * 0.08 // Closer to body, mounted on top
                 positions[i3] = x
                 positions[i3 + 1] = y
                 positions[i3 + 2] = z
             } else {
-                // Shutter button and details (top right)
-                const x = 0.5 + Math.random() * 0.3
-                const y = 0.6 + Math.random() * 0.15
-                const z = 0.0 + Math.random() * 0.2
-                positions[i3] = x
-                positions[i3 + 1] = y
-                positions[i3 + 2] = z
+                // Shutter button - REDUCED particles
+                const length = Math.random() * 0.15 // Cylinder length (horizontal)
+                const angle = Math.random() * Math.PI * 2
+                const r = Math.random() * 0.06 // Smaller radius for button
+
+                positions[i3] = -0.7 + length // X position varies along length
+                positions[i3 + 1] = 0.55 + r * Math.cos(angle) // Y - circular cross section
+                positions[i3 + 2] = 0.05 + r * Math.sin(angle) // Z - circular cross section
+
+                if (cameraData) cameraData.shutterIndices[i] = 1 // Mark as shutter
             }
+        }
+
+        if (sceneRef.current && cameraData) {
+            sceneRef.current.cameraData = cameraData
         }
 
         return positions
@@ -710,7 +824,7 @@ export function ParticleMorph({
                 break
             case 'camera':
                 positions = generateCamera(count)
-                scaleFactor = 1.2 // Camera is slightly smaller
+                scaleFactor = 1.95 // Camera - larger size (increased by ~20%)
                 break
             case 'cube':
                 positions = generateCube(count)
@@ -1092,6 +1206,128 @@ export function ParticleMorph({
                 }
             }
 
+            // CAMERA SPECIFIC ANIMATION (Shutter Button Press)
+            const isCamera = sceneRef.current.currentTarget === 'camera'
+            if (isCamera && sceneRef.current.cameraData) {
+                const { shutterIndices } = sceneRef.current.cameraData
+                const positions = sceneRef.current.targetPositions
+
+                // Store base positions on first frame if not exists
+                if (!sceneRef.current.cameraData.baseShutterPositions) {
+                    sceneRef.current.cameraData.baseShutterPositions = new Float32Array(positions)
+                }
+                const basePositions = sceneRef.current.cameraData.baseShutterPositions
+
+                // 7.5-second Fast Scenario Loop (Reduced Delays)
+                // 0-1.5s: Center (Trigger at 0.2s)
+                // 1.5-2.5s: Turn Right (Spring)
+                // 2.5-4.0s: Right Hold (Trigger at 2.6s)
+                // 4.0-5.0s: Turn Left (Spring)
+                // 5.0-6.5s: Left Hold (Trigger at 5.1s)
+                // 6.5-7.5s: Return Center
+
+                const loopDuration = 7.5 // Faster loop
+                const t = (currentTime * 0.001) % loopDuration
+
+                // Spring Easing (Overshoot)
+                const easeOutBack = (x: number): number => {
+                    const c1 = 1.70158
+                    const c3 = c1 + 1
+                    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
+                }
+
+                // --- 1. ROTATION LOGIC ---
+                let targetYRot = 0;
+
+                if (t < 1.5) {
+                    targetYRot = 0; // Center hold
+                } else if (t < 2.5) {
+                    // Turn Right (0 to +45 deg)
+                    const p = (t - 1.5); // 0 to 1
+                    const ease = easeOutBack(p);
+                    targetYRot = ease * (Math.PI / 4);
+                } else if (t < 4.0) {
+                    targetYRot = Math.PI / 4; // Right hold
+                } else if (t < 5.0) {
+                    // Turn Right to Left (+45 to -45 deg)
+                    const p = (t - 4.0);
+                    const ease = easeOutBack(p);
+                    targetYRot = (Math.PI / 4) - ease * (Math.PI / 2);
+                } else if (t < 6.5) {
+                    targetYRot = -Math.PI / 4; // Left hold
+                } else {
+                    // Return Center (-45 to 0 deg)
+                    const p = Math.min(1, (t - 6.5));
+                    const ease = easeOutBack(p);
+                    targetYRot = (-Math.PI / 4) + ease * (Math.PI / 4);
+                }
+
+                sceneRef.current.particles.rotation.y = targetYRot;
+                sceneRef.current.particles.rotation.x = 0;
+
+                // --- 2. SHUTTER / APERTURE TRIGGER ---
+                // Triggers: 0.2, 2.6, 5.1
+                let pressAmount = 0;
+                const triggers = [0.2, 2.6, 5.1];
+
+                for (const trigTime of triggers) {
+                    const diff = t - trigTime;
+                    if (diff >= 0 && diff < 0.5) {
+                        const phase = (diff / 0.5) * Math.PI;
+                        pressAmount = Math.sin(phase);
+                    }
+                }
+
+                // 1. Shutter Button (Vertical Press)
+                const pressDepth = 0.06 // Visible movement
+                const yOffset = -pressAmount * pressDepth
+
+                // 2. Aperture Animation
+                // Max scaling: closes to 80% size (scales down by 20%)
+                const apertureScale = 1.0 - (pressAmount * 0.20)
+                const apertureRotation = pressAmount * (Math.PI / 4) // Twists 45 degrees
+
+                // Apply to shutter button and aperture particles
+                for (let i = 0; i < particleCount; i++) {
+                    const i3 = i * 3
+
+                    if (shutterIndices[i] === 1) { // Shutter Button
+                        const baseX = basePositions[i3]
+                        const baseY = basePositions[i3 + 1]
+                        const baseZ = basePositions[i3 + 2]
+
+                        // Apply press offset
+                        positions[i3] = baseX
+                        positions[i3 + 1] = baseY + yOffset
+                        positions[i3 + 2] = baseZ
+                    } else if (shutterIndices[i] === 2) { // Aperture Blade
+                        const baseX = basePositions[i3]
+                        const baseY = basePositions[i3 + 1]
+                        const baseZ = basePositions[i3 + 2]
+
+                        // Calculate radius and angle
+                        const r = Math.sqrt(baseX * baseX + baseY * baseY)
+                        const angle = Math.atan2(baseY, baseX)
+
+                        // Apply animation
+                        const newR = r * apertureScale
+                        const newAngle = angle + apertureRotation
+
+                        // Set new position
+                        positions[i3] = newR * Math.cos(newAngle)
+                        positions[i3 + 1] = newR * Math.sin(newAngle)
+                        positions[i3 + 2] = baseZ
+                    }
+                }
+
+                // Sync if fully morphed
+                if (sceneRef.current.animationProgress >= 1) {
+                    const currentPos = sceneRef.current.particles.geometry.attributes.position.array as Float32Array
+                    currentPos.set(sceneRef.current.targetPositions)
+                    sceneRef.current.particles.geometry.attributes.position.needsUpdate = true
+                }
+            }
+
 
             // Smooth animation progress
             if (sceneRef.current.animationProgress < 1) {
@@ -1194,8 +1430,10 @@ export function ParticleMorph({
                 // Yaw (Y): Coupled with Roll for realism
                 // We add roll * 0.5 to yaw to simulate banking turn logic
                 sceneRef.current.particles.rotation.y = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
-            } else {
-                // Continually rotate for shapes
+                // We add roll * 0.5 to yaw to simulate banking turn logic
+                sceneRef.current.particles.rotation.y = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
+            } else if (!isCamera) { // Don't rotate camera here, it has its own logic
+                // Continually rotate for other shapes
                 sceneRef.current.particles.rotation.y += currentRotationSpeed * deltaTime
 
                 // Slight tilt effect for 3D feel

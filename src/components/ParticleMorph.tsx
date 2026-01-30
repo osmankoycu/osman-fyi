@@ -422,7 +422,7 @@ export function ParticleMorph({
         return positions
     }
 
-    // Generate scissors shape
+    // Generate scissors shape (revised based on reference image)
     const generateScissors = (count: number): Float32Array => {
         const positions = new Float32Array(count * 3)
         // Store scissors data
@@ -433,79 +433,63 @@ export function ParticleMorph({
         // Split particles roughly evenly between two scissor arms
         const armCount = Math.floor(count / 2)
 
-        // Scissors Dimensions
-        const bladeLength = 2.0
-        const bladeWidth = 0.3
-        const handleLength = 1.0
-        const pivotY = 0.2 // Pivot point offset from center
+        // Scissors Dimensions (based on reference image)
+        const bladeLength = 2.0 // Blade length
+        const bladeWidth = 0.25 // Narrower blades
+        const handleRadius = 0.35 // Smaller, more circular handles
+        const handleCenterY = -1.1 // Handle position
+        const pivotY = 0.0 // Pivot at center
 
         for (let i = 0; i < count; i++) {
             const i3 = i * 3
             const isArm1 = i < armCount
 
-            // Asymmetry:
-            // Arm 1 Handle (Right Handle when open/viewed): Standard circular "Thumb"
-            // Arm 2 Handle (Left Handle when open/viewed): Elongated oval "Finger"
-
             const r = Math.random()
             let x, y, z
 
-            if (r < 0.6) {
-                // Blade (60% of particles)
-                // Long tapered triangle
-                const t = Math.random() // Distance along blade
-                const w = (1 - t) * bladeWidth // Taper out
+            if (r < 0.65) {
+                // Blade (65% of particles) - Longer, sharper taper
+                const t = Math.random() // Distance along blade (0 = pivot, 1 = tip)
+
+                // Sharper taper - blade gets very thin at tip
+                const w = Math.pow(1 - t, 1.5) * bladeWidth // More aggressive taper
 
                 y = t * bladeLength
                 x = (Math.random() - 0.5) * w
-                z = (Math.random() - 0.5) * 0.1 // Thin depth
+                z = (Math.random() - 0.5) * 0.08 // Very thin blade
             } else {
-                // Handle (40% of particles) - With visual connection neck
+                // Handle (35% of particles)
                 const subR = Math.random()
 
-                if (subR < 0.35) {
-                    // Neck / Shaft connecting pivot to ring
-                    // Should stop at the TOP of the ring, not center.
-                    // Ring centers are at -handleLength (-1.0) and (-1.2).
-                    // Top of rings approx: -1.0 + 0.45 = -0.55.
-
+                if (subR < 0.3) {
+                    // Neck connecting pivot to handle ring - straight connection
                     const t = Math.random()
-                    // Go from 0 down to roughly -0.55 (just touching top of ring)
-                    y = -t * 0.55
+                    // Connect from pivot (0) to top of handle ring
+                    const handleTopY = handleCenterY + handleRadius * 0.8
+                    y = t * handleTopY
 
-                    // Taper the neck? Or uniform.
-                    const neckWidth = 0.2
-                    x = (Math.random() - 0.5) * neckWidth
-                    z = (Math.random() - 0.5) * 0.15
+                    // Neck width - straight down from blade
+                    x = (Math.random() - 0.5) * 0.18 * (1 - t * 0.3)
+                    z = (Math.random() - 0.5) * 0.12
                 } else {
-                    // Ring Loop
+                    // Handle ring - circular, positioned straight below the blade
                     const angle = Math.random() * Math.PI * 2
-                    const ringCy = -handleLength
 
-                    if (isArm1) {
-                        // "Thumb" handle - Smaller, rounder
-                        const handleRadius = 0.45
-                        const rad = handleRadius * (0.7 + 0.3 * Math.random())
-                        x = rad * Math.cos(angle)
-                        y = ringCy + rad * Math.sin(angle)
-                    } else {
-                        // "Finger" handle - Larger, oval
-                        const handleRadiusX = 0.45
-                        const handleRadiusY = 0.65
-                        const rad = (0.7 + 0.3 * Math.random())
+                    // Ring thickness variation for 3D effect
+                    const ringThickness = 0.75 + 0.25 * Math.random()
+                    const rad = handleRadius * ringThickness
 
-                        x = handleRadiusX * rad * Math.cos(angle)
-                        y = (ringCy - 0.2) + handleRadiusY * rad * Math.sin(angle)
-                    }
-                    z = (Math.random() - 0.5) * 0.15
+                    x = rad * Math.cos(angle)
+                    y = handleCenterY + rad * Math.sin(angle)
+                    z = (Math.random() - 0.5) * 0.12
                 }
             }
 
-            // Assembly Separation
-            const gapOffset = 0.06 // X separation
+            // Assembly - slight separation at pivot
+            const gapOffset = 0.04 // Smaller gap for tighter fit
             const xOffset = isArm1 ? -gapOffset : gapOffset
 
-            // Initial "Open" Angle
+            // Initial "Open" Angle - matches animation range
             const initialOpenAngle = 0.6
             const rotation = isArm1 ? initialOpenAngle : -initialOpenAngle
 
@@ -517,7 +501,7 @@ export function ParticleMorph({
 
             positions[i3] = rx
             positions[i3 + 1] = ry + pivotY
-            positions[i3 + 2] = z + (isArm1 ? 0.05 : -0.05) // Z separation
+            positions[i3 + 2] = z + (isArm1 ? 0.04 : -0.04) // Slight Z separation
 
             if (scissorsData) {
                 scissorsData.armIndices[i] = isArm1 ? 0 : 1
@@ -1043,20 +1027,20 @@ export function ParticleMorph({
                 // Angle(t - dt) = 0.2 * sin(time - dt).
                 // dAngle = Angle(t) - Angle(t - dt).
 
-                // Oscillating motion: Fully close to Open
+                // Oscillating motion: Open to Fully Closed
                 // Initial state in generateScissors has arms at +/- 0.6 radians (Open).
-                // We want to oscillate the arm angle between ~0.05 (Closed, handles touching) and ~0.55 (Open).
-                // Start near open (0.55) so no jump at t=0.
+                // We want to oscillate the arm angle between 0.6 (Open) and 0 (Fully Closed).
+                // Start at open (0.6) so no jump at t=0.
 
                 const scissorsTime = currentTime * 0.001
                 const speed = 4.0
 
                 // Angle of ONE arm relative to vertical axis
-                // Range: [0.05, 0.55]
-                // 0.3 mid, +/- 0.25
-                // Cos starts at 1 -> 0.3 + 0.25 = 0.55 (Open)
-                const armAngleNow = 0.3 + 0.25 * Math.cos(scissorsTime * speed)
-                const armAnglePrev = 0.3 + 0.25 * Math.cos((scissorsTime - deltaTime) * speed)
+                // Range: [0, 0.6] - When closed (0), blades fully meet; when open (0.6), scissors are open
+                // Add phase offset (π) so cos starts at -1 -> 0.3 - 0.3*(-1) = 0.6 (Open at t=0)
+                // Then oscillates to cos=1 -> 0.3 - 0.3*1 = 0 (Fully Closed)
+                const armAngleNow = 0.3 - 0.3 * Math.cos(scissorsTime * speed + Math.PI)
+                const armAnglePrev = 0.3 - 0.3 * Math.cos((scissorsTime - deltaTime) * speed + Math.PI)
 
                 // Change in angle this frame
                 // If closing (Now < Prev), dAngle is negative.
@@ -1073,7 +1057,7 @@ export function ParticleMorph({
                 const cos2 = Math.cos(-dAngle)
                 const sin2 = Math.sin(-dAngle)
 
-                const pivotY = 0.2 // Must match generated pivot offset
+                const pivotY = 0.0 // Must match generated pivot offset
 
                 for (let i = 0; i < particleCount; i++) {
                     const armIdx = armIndices[i]

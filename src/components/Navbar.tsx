@@ -57,7 +57,7 @@ export function Navbar() {
         { label: 'Photography', href: '/photography', morphTarget: 'camera' as MorphTarget },
         { label: 'Curation', href: '/curation', morphTarget: 'curation' as MorphTarget },
         { label: isStuck ? 'Osman Köycü' : 'About Me', href: '/about', morphTarget: 'hand' as MorphTarget },
-        { label: 'Email', href: 'mailto:osmankoycu@gmail.com', morphTarget: 'default' as MorphTarget },
+        { label: 'Email', href: 'mailto:osmankoycu@gmail.com', morphTarget: 'plane' as MorphTarget },
     ]
 
     // Handle hover events for particle morph

@@ -619,30 +619,87 @@ export function ParticleMorph({
     // Generate plane shape (paper airplane)
     const generatePlane = (count: number): Float32Array => {
         const positions = new Float32Array(count * 3)
+        // Length 3.0, Wingspan 2.2
 
-        for (let i = 0; i < count; i++) {
-            const i3 = i * 3
-            const t = i / count
+        // Vertices
+        // Adjust for "narrower" more aerodynamic paper plane look from image
+        const vNose = [0, 0, 1.8]
+        // Split tail center for "gap" at the top (where wings meet body)
+        const gap = 0.15
 
-            // Create a paper airplane shape
-            const wingSpan = 2.5
-            const length = 3
+        // Wing Tail points (inner corners) - higher up
+        const vTailLeft = [-gap, 0.2, -1.5]
+        const vTailRight = [gap, 0.2, -1.5]
 
-            if (t < 0.4) {
-                // Body/nose
-                const bodyT = t / 0.4
-                positions[i3] = (Math.random() - 0.5) * 0.2
-                positions[i3 + 1] = (Math.random() - 0.5) * 0.2
-                positions[i3 + 2] = -length / 2 + bodyT * length
-            } else {
-                // Wings
-                const wingT = (t - 0.4) / 0.6
-                const z = -length / 4 + wingT * length / 2
-                const x = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * wingSpan / 2)
-                positions[i3] = x
-                positions[i3 + 1] = Math.abs(x) * 0.2 + (Math.random() - 0.5) * 0.1
-                positions[i3 + 2] = z
+        // Wing Tips (outer corners)
+        const vWingLeft = [-1.3, 0.4, -1.8]
+        const vWingRight = [1.3, 0.4, -1.8]
+
+        // Bottom keel (fuselage) - The two bottom flaps must MEET at the bottom crease.
+        // So we use a single central point for the bottom back.
+        // This creates a V-shape or Triangle when viewed from behind.
+        const vKeelBack = [0, -0.5, -1.2]
+
+        // Define surfaces (triangles)
+        const surfaces = [
+            // Left Wing (Top face)
+            { a: vNose, b: vWingLeft, c: vTailLeft, weight: 1 },
+            // Right Wing (Top face)
+            { a: vNose, b: vWingRight, c: vTailRight, weight: 1 },
+
+            // Left Fuselage (Side/Bottom)
+            // Connect Nose to Central Keel to TailLeft
+            { a: vNose, b: vKeelBack, c: vTailLeft, weight: 0.6 },
+
+            // Right Fuselage (Side/Bottom)
+            // Connect Nose to Central Keel to TailRight
+            { a: vNose, b: vKeelBack, c: vTailRight, weight: 0.6 }
+
+            // Result: Fuselage is connected at the bottom (KeelBack), but open at the top (TailLeft/Right).
+            // Forms a triangular hull.
+        ]
+
+        // Calculate total weight to distribute particles
+        // Actually simpler to just pick a random surface based on weight
+        const totalWeight = surfaces.reduce((sum, s) => sum + s.weight, 0)
+
+        let pIndex = 0
+
+        // Loop to fill particles
+        while (pIndex < count) {
+            // Pick surface
+            let r = Math.random() * totalWeight
+            let surface = surfaces[0]
+            for (let s of surfaces) {
+                if (r < s.weight) {
+                    surface = s
+                    break
+                }
+                r -= s.weight
             }
+
+            // Random point in triangle
+            // P = (1 - sqrt(r1)) * A + (sqrt(r1) * (1 - r2)) * B + (sqrt(r1) * r2) * C
+            const r1 = Math.random()
+            const r2 = Math.random()
+
+            const sqR1 = Math.sqrt(r1)
+            const wA = 1 - sqR1
+            const wB = sqR1 * (1 - r2)
+            const wC = sqR1 * r2
+
+            const px = wA * surface.a[0] + wB * surface.b[0] + wC * surface.c[0]
+            const py = wA * surface.a[1] + wB * surface.b[1] + wC * surface.c[1]
+            const pz = wA * surface.a[2] + wB * surface.b[2] + wC * surface.c[2]
+
+            // Add slight noise for "paper texture" / thickness
+            const noise = 0.02
+
+            positions[pIndex * 3] = px + (Math.random() - 0.5) * noise
+            positions[pIndex * 3 + 1] = py + (Math.random() - 0.5) * noise
+            positions[pIndex * 3 + 2] = pz + (Math.random() - 0.5) * noise
+
+            pIndex++
         }
 
         return positions
@@ -685,7 +742,7 @@ export function ParticleMorph({
                 break
             case 'plane':
                 positions = generatePlane(count)
-                scaleFactor = 1.0 // Plane is similar size
+                scaleFactor = 1.6 // Larger size
                 break
             case 'hand':
                 positions = generateHand(count)
@@ -1089,6 +1146,13 @@ export function ParticleMorph({
                 sceneRef.current.particles.geometry.attributes.alpha.needsUpdate = true
             }
 
+            // Apply position offset (e.g. Plane needs to be offset Right and Up)
+            const targetMeshPos = new THREE.Vector3(0, 0, 0)
+            if (sceneRef.current.currentTarget === 'plane') {
+                targetMeshPos.set(0.8, 0.3, 0) // Shift Right (1.5) and Up (1.0)
+            }
+            sceneRef.current.particles.position.lerp(targetMeshPos, deltaTime * 3.0)
+
             // Apply rotation
             if (isDefault) {
                 // Smoothly return to nearest aligned rotation (0, 180, 360, etc.)
@@ -1116,6 +1180,36 @@ export function ParticleMorph({
 
                 // 3. Slight X-Axis breathing
                 sceneRef.current.particles.rotation.x = Math.sin(currentTime * 0.001) * 0.05
+            } else if (sceneRef.current.currentTarget === 'plane') {
+                // Gliding animation for paper plane
+
+                // --- PLANE CONFIGURATION ---
+                // Adjust these values to change the plane's flight path
+                const config = {
+                    // Base Angles (Radians)
+                    baseX: 0.5,       // Pitch: Positive = Nose Down (Tail up), reveals Top surface strongly
+                    baseY: Math.PI - 0.6, // Yaw: Facing diagonally LEFT
+                    baseZ: -0.1,      // Roll: Banking LEFT
+
+                    // Animation Intensity (Sway amount)
+                    swayX: 0.05,      // Pitch fluctuation
+                    swayY: 0.2,       // Yaw fluctuation
+                    swayZ: 0.15       // Roll fluctuation
+                }
+                // ---------------------------
+
+                const time = currentTime * 0.001
+
+                // Roll (Z): Gentle sway
+                const roll = Math.sin(time * 1.5) * config.swayZ
+                sceneRef.current.particles.rotation.z = config.baseZ + roll
+
+                // Pitch (X): Base ascent + slight fluctuation
+                sceneRef.current.particles.rotation.x = config.baseX + Math.sin(time * 1.0) * config.swayX
+
+                // Yaw (Y): Coupled with Roll for realism
+                // We add roll * 0.5 to yaw to simulate banking turn logic
+                sceneRef.current.particles.rotation.y = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
             } else {
                 // Continually rotate for shapes
                 sceneRef.current.particles.rotation.y += currentRotationSpeed * deltaTime

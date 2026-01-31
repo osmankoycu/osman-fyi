@@ -71,10 +71,11 @@ export function ParticleMorph({
     const generateHand = (count: number): Float32Array => {
         const positions = new Float32Array(count * 3)
 
-        // Distribution: Palm 40%, Wrist 10%, Fingers 50%
+        // Distribution: Palm 40%, Wrist 10%, Joints 1.5% (Targeted), Fingers Rest
         const palmCount = Math.floor(count * 0.4)
         const wristCount = Math.floor(count * 0.1)
-        const fingerCount = Math.floor((count - palmCount - wristCount) / 5)
+        const jointCount = Math.floor(count * 0.015) // Reduced from 0.05 to ~90 particles (appropriate for small gap)
+        const fingerCount = Math.floor((count - palmCount - wristCount - jointCount) / 5)
 
         let pIndex = 0
 
@@ -158,7 +159,33 @@ export function ParticleMorph({
             pIndex++
         }
 
-        // 3. Fingers
+        // 3. Joints (Reinforce connections for Index and Middle fingers)
+        for (let i = 0; i < jointCount; i++) {
+            const i3 = pIndex * 3
+
+            // Randomly pick Index or Middle finger base
+            const isIndex = Math.random() < 0.5
+
+            // Index Base: x=-0.6, y=0.74, w=0.30 (r=0.15)
+            // Middle Base: x=-0.2, y=0.79, w=0.32 (r=0.16)
+
+            const baseX = isIndex ? -0.6 : -0.2
+            const baseY = isIndex ? 0.74 : 0.79
+            const radius = isIndex ? 0.155 : 0.165
+
+            // Use sqrt(random) for uniform distribution
+            const r = Math.sqrt(Math.random()) * radius
+            const angle = Math.random() * Math.PI * 2
+            const zDepth = (Math.random() - 0.5) * 0.3
+
+            positions[i3] = baseX + r * Math.cos(angle)
+            positions[i3 + 1] = baseY + r * Math.sin(angle) * 0.6 // Compressed Y
+            positions[i3 + 2] = zDepth
+
+            pIndex++
+        }
+
+        // 4. Fingers
         const fingerSpecs = [
             { x: -0.8, y: -0.3, ang: 0.5, len: 1.0, w: 0.38 }, // Thumb - Thicker
             { x: -0.6, y: 0.75, ang: 0.1, len: 1.1, w: 0.30 }, // Index

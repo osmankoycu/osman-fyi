@@ -1038,8 +1038,8 @@ export function ParticleMorph({
             const isClock = sceneRef.current.currentTarget === 'curation'
             const isHand = sceneRef.current.currentTarget === 'hand'
 
-            // Shapes rotate, default doesn't
-            const targetRotationSpeed = isDefault || isHand ? 0 : 0.1
+            // Shapes rotate, default doesn't. Atom/Clock/Hand have specific logic -> 0 base speed
+            const targetRotationSpeed = isDefault || isHand || isAtom ? 0 : 0.1
             // Default has noise, shapes don't (to preserve shape clarity)
             const targetNoiseStrength = isDefault ? 1.0 : 0.0
 
@@ -1469,8 +1469,8 @@ export function ParticleMorph({
                 while (dY > Math.PI) dY -= Math.PI * 2
                 while (dY < -Math.PI) dY += Math.PI * 2
                 sceneRef.current.particles.rotation.y += dY * deltaTime * lerpSpeed
-            } else if (isClock) {
-                // Clock handles its own internal rotation (hands)
+            } else if (isClock || isAtom) {
+                // Clock and Atom handle their own internal animation
                 // We just need to stop the global rotation from "else" block
 
                 // Perhaps a gentle sway for the whole clock?

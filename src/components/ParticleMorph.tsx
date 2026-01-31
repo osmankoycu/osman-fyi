@@ -38,8 +38,9 @@ export function ParticleMorph({
         cubeData?: {
             innerShapeIndices: Int8Array // 1 for inner shape, 0 for outer cube
         }
-        scissorsData?: {
-            armIndices: Int8Array // 0 for Left Arm (Blade+Handle), 1 for Right Arm
+        clockData?: {
+            handIndices: Int8Array // 0: None, 1: Hour, 2: Minute, 3: Second
+            baseHandPositions: Float32Array // Store base positions for rotation
         }
         cameraData?: {
             shutterIndices: Int8Array // 1 for shutter button, 0 for other parts
@@ -426,94 +427,150 @@ export function ParticleMorph({
         return positions
     }
 
-    // Generate scissors shape (revised based on reference image)
-    const generateScissors = (count: number): Float32Array => {
+    // Generate wall clock shape
+    const generateClock = (count: number): Float32Array => {
         const positions = new Float32Array(count * 3)
-        // Store scissors data
-        const scissorsData = sceneRef.current ? {
-            armIndices: new Int8Array(count)
+        // Store clock data
+        const clockData = sceneRef.current ? {
+            handIndices: new Int8Array(count),
+            baseHandPositions: new Float32Array(count * 3)
         } : null
 
-        // Split particles roughly evenly between two scissor arms
-        const armCount = Math.floor(count / 2)
+        if (clockData) clockData.handIndices.fill(0)
 
-        // Scissors Dimensions (based on reference image)
-        const bladeLength = 2.0 // Blade length
-        const bladeWidth = 0.25 // Narrower blades
-        const handleRadius = 0.35 // Smaller, more circular handles
-        const handleCenterY = -1.1 // Handle position
-        const pivotY = 0.0 // Pivot at center
+        let pIndex = 0
 
-        for (let i = 0; i < count; i++) {
-            const i3 = i * 3
-            const isArm1 = i < armCount
+        // 1. Clock Face / Rim (Increased to 55% to absorb extra particles)
+        const faceCount = Math.floor(count * 0.55)
+        // Multiple rings for thickness
+        const rimRadius = 2.0
+        const rimThickness = 0.15
 
-            const r = Math.random()
-            let x, y, z
+        for (let i = 0; i < faceCount; i++) {
+            const i3 = pIndex * 3
+            const angle = Math.random() * Math.PI * 2
 
-            if (r < 0.65) {
-                // Blade (65% of particles) - Longer, sharper taper
-                const t = Math.random() // Distance along blade (0 = pivot, 1 = tip)
+            // Distribute mainly on the rim, some separate rings for style
+            const t = Math.random()
+            let r = rimRadius
 
-                // Sharper taper - blade gets very thin at tip
-                const w = Math.pow(1 - t, 1.5) * bladeWidth // More aggressive taper
-
-                y = t * bladeLength
-                x = (Math.random() - 0.5) * w
-                z = (Math.random() - 0.5) * 0.08 // Very thin blade
+            if (t < 0.7) {
+                // Main outer rim
+                r = rimRadius + (Math.random() - 0.5) * rimThickness
+            } else if (t < 0.85) {
+                // Inner ring detail
+                r = rimRadius * 0.9 + (Math.random() - 0.5) * 0.05
             } else {
-                // Handle (35% of particles)
-                const subR = Math.random()
-
-                if (subR < 0.3) {
-                    // Neck connecting pivot to handle ring - straight connection
-                    const t = Math.random()
-                    // Connect from pivot (0) to top of handle ring
-                    const handleTopY = handleCenterY + handleRadius * 0.8
-                    y = t * handleTopY
-
-                    // Neck width - straight down from blade
-                    x = (Math.random() - 0.5) * 0.18 * (1 - t * 0.3)
-                    z = (Math.random() - 0.5) * 0.12
+                // Center hub cap - slightly reduced probability
+                if (Math.random() > 0.5) {
+                    r = Math.random() * 0.15
                 } else {
-                    // Handle ring - circular, positioned straight below the blade
-                    const angle = Math.random() * Math.PI * 2
-
-                    // Ring thickness variation for 3D effect
-                    const ringThickness = 0.75 + 0.25 * Math.random()
-                    const rad = handleRadius * ringThickness
-
-                    x = rad * Math.cos(angle)
-                    y = handleCenterY + rad * Math.sin(angle)
-                    z = (Math.random() - 0.5) * 0.12
+                    // Add to outer rim if skipped
+                    r = rimRadius + (Math.random() - 0.5) * rimThickness
                 }
             }
 
-            // Assembly - slight separation at pivot
-            const gapOffset = 0.04 // Smaller gap for tighter fit
-            const xOffset = isArm1 ? -gapOffset : gapOffset
+            positions[i3] = r * Math.cos(angle)
+            positions[i3 + 1] = r * Math.sin(angle)
+            positions[i3 + 2] = (Math.random() - 0.5) * 0.1 // Flat
 
-            // Initial "Open" Angle - matches animation range
-            const initialOpenAngle = 0.6
-            const rotation = isArm1 ? initialOpenAngle : -initialOpenAngle
+            pIndex++
+        }
 
-            const cos = Math.cos(rotation)
-            const sin = Math.sin(rotation)
+        // 2. Hour Markers (10% of particles)
+        const markerCount = Math.floor(count * 0.10)
+        const markersPerHour = Math.floor(markerCount / 12)
 
-            const rx = (x + xOffset) * cos - y * sin
-            const ry = (x + xOffset) * sin + y * cos
+        for (let h = 0; h < 12; h++) {
+            const hAngle = (h / 12) * Math.PI * 2
 
-            positions[i3] = rx
-            positions[i3 + 1] = ry + pivotY
-            positions[i3 + 2] = z + (isArm1 ? 0.04 : -0.04) // Slight Z separation
+            // Marker shape: short line or block
+            const isCardinal = (h % 3 === 0) // 12, 3, 6, 9 are bigger
 
-            if (scissorsData) {
-                scissorsData.armIndices[i] = isArm1 ? 0 : 1
+            for (let i = 0; i < markersPerHour; i++) {
+                if (pIndex >= count) break
+                const i3 = pIndex * 3
+
+                // Line extending inwards from rim
+                const len = isCardinal ? 0.4 : 0.2
+                const distObj = rimRadius * 0.85 + Math.random() * len
+
+                // Add some thickness/noise
+                const wNoise = (Math.random() - 0.5) * 0.08
+
+                // Rotated position
+                const r = distObj
+                const angleOffset = wNoise / r
+
+                positions[i3] = r * Math.cos(hAngle + angleOffset)
+                positions[i3 + 1] = r * Math.sin(hAngle + angleOffset)
+                positions[i3 + 2] = (Math.random() - 0.5) * 0.1
+
+                pIndex++
             }
         }
 
-        if (sceneRef.current && scissorsData) {
-            sceneRef.current.scissorsData = scissorsData
+        // 3. Hands - Explicit Counts
+        const hCount = 500
+        const mCount = 700
+        const sCount = 200 // Reduced count for thinner look
+
+        // Function to generate hand particles pointing UP (Positive Y)
+        const generateHand = (c: number, width: number, length: number, type: number, zOffset: number) => {
+            for (let i = 0; i < c; i++) {
+                if (pIndex >= count) break
+                const i3 = pIndex * 3
+
+                // Rectangle pointing up
+                const x = (Math.random() - 0.5) * width
+                const y = Math.random() * length
+                const z = zOffset + (Math.random() - 0.5) * 0.05
+
+                positions[i3] = x
+                positions[i3 + 1] = y
+                positions[i3 + 2] = z
+
+                if (clockData) {
+                    clockData.handIndices[pIndex] = type
+                    // Store BASE Position (Unrotated)
+                    clockData.baseHandPositions[i3] = x
+                    clockData.baseHandPositions[i3 + 1] = y
+                    clockData.baseHandPositions[i3 + 2] = z
+                }
+
+                pIndex++
+            }
+        }
+
+        // Hour Hand: Short, Thick
+        generateHand(hCount, 0.25, 1.1, 1, 0.1)
+
+        // Minute Hand: Long, Medium
+        generateHand(mCount, 0.15, 1.7, 2, 0.15)
+
+        // Second Hand: Longest -> Shortened to 1.6, VERY Thin
+        generateHand(sCount, 0.025, 1.6, 3, 0.2) // Length 1.9 -> 1.6
+
+        // 4. Background Scatter (Remaining Particles - Reduced pool due to increased Rim)
+        // Fill the clock face slightly to give it volume/surface, behind hands
+        while (pIndex < count) {
+            const i3 = pIndex * 3
+
+            // Random point inside inner rim (random distribution in circle)
+            // r = R * sqrt(random) for uniform area 
+            const r = Math.sqrt(Math.random()) * (rimRadius * 0.85)
+            const theta = Math.random() * Math.PI * 2
+
+            positions[i3] = r * Math.cos(theta)
+            positions[i3 + 1] = r * Math.sin(theta)
+            // Slightly behind hands (z < 0)
+            positions[i3 + 2] = -0.05 + (Math.random() - 0.5) * 0.05
+
+            pIndex++
+        }
+
+        if (sceneRef.current && clockData) {
+            sceneRef.current.clockData = clockData
         }
 
         return positions
@@ -831,8 +888,8 @@ export function ParticleMorph({
                 scaleFactor = 1.5 // Cube needs scaling up
                 break
             case 'curation':
-                positions = generateScissors(count)
-                scaleFactor = 1.2 // Size adjustment
+                positions = generateClock(count)
+                scaleFactor = 1.0 // Size adjustment
                 break
             case 'palette':
                 positions = generatePalette(count)
@@ -978,7 +1035,7 @@ export function ParticleMorph({
             const isDefault = sceneRef.current.currentTarget === 'default'
             const isAtom = sceneRef.current.currentTarget === 'atom'
             const isCube = sceneRef.current.currentTarget === 'cube'
-            const isScissors = sceneRef.current.currentTarget === 'curation'
+            const isClock = sceneRef.current.currentTarget === 'curation'
             const isHand = sceneRef.current.currentTarget === 'hand'
 
             // Shapes rotate, default doesn't
@@ -1085,117 +1142,55 @@ export function ParticleMorph({
                 }
             }
 
-            // SCISSORS SPECIFIC ANIMATION (Cutting Motion)
-            if (isScissors && sceneRef.current.scissorsData) {
-                const { armIndices } = sceneRef.current.scissorsData
+            // CLOCK SPECIFIC ANIMATION
+            if (isClock && sceneRef.current.clockData) {
+                const { handIndices, baseHandPositions } = sceneRef.current.clockData
                 const positions = sceneRef.current.targetPositions
 
-                // Oscillating motion
-                // Speed of cut
-                const cutSpeed = 5.0
-                const cutAmplitude = 0.5 // Radians for range of motion
-                // We want them to open and close. 
-                // We calculated them in an "open" position approx 0.6 rads. 
-                // Let's sweep current offset from -0.3 to +0.3
+                // Get Real Time
+                const date = new Date()
+                const s = date.getSeconds() + date.getMilliseconds() / 1000
+                const m = date.getMinutes() + s / 60
+                const h = date.getHours() % 12 + m / 60
 
-                // Calculate oscillation delta
-                // We need to apply 'delta' rotation to revert to neutral, then apply new rotation
-                // Actually, easier: re-calculate position from "Base" parameters?
-                // But we don't store base parameters per particle easily (radius, distance along blade, etc).
-                // Strategy: We can apply incremental rotation, but oscillating incremental is tricky without drift.
+                // Calculate Rotation Angles (Radians)
+                // 12 o'clock = 0 rads relative to our UP interval? 
+                // In generating, we pointed Hands UP (Y+).
+                // Rotation is clockwise (negative around Z).
 
-                // BETTER STRATEGY: 
-                // Since we need to oscillate, we should compute the *total* desired angle at this time frame, 
-                // and rotate the *current* points to match? No, points are already rotated.
-                // Re-generating from scratch is expensive in a frame loop? No, 6000 particles is cheap for JS these days.
-                // Let's Try: Rotating back by 'previous frame angle' and forward by 'new frame angle'?
-                // Or just: Rotate by (newAngle - oldAngle).
-
-                // Angle logic:
-                // Base Open Angle = 0.6
-                // Anim Offset = sin(time) * 0.4
-                // Current Absolute Angle = 0.6 + Anim Offset.
-
-                // Let's track "currentAnimAngle" in a mutable var outside or derive from time?
-                // We can derive from time.
-                const time = currentTime * 0.001
-                const phase = Math.sin(time * 5.0)
-
-                // Current desired offset from the "baked in" position.
-                // The baked position has `initialOpenAngle = 0.6`.
-                // We want to range from "Closed" (angle near 0) to "Open" (angle 0.6 or more).
-                // Let's say we want angle to oscillate between 0.1 and 0.8
-                // Baked is 0.6.
-                // Desired Angle = 0.45 + 0.35 * sin(time)
-                // Delta Angle required = (Desired - PreviousDesired)
-
-                // To avoid drift errors with incremental float math, normally we'd store "original unrotated" positions.
-                // But for now, let's use incremental with `lastTime` logic.
-
-                // Store `lastPhase` for scissors? We don't have a persistent state for it easily without modifying ref.
-                // Let's assume (angle - prevAngle) is safe enough for short durations. 
-                // Or better: Let's rotate 'back' the amount we rotated 'forward' last frame? No we don't know it.
-
-                // Let's use `Math.sin(time)`. 
-                // Angle(t) = 0.2 * sin(time).
-                // Angle(t - dt) = 0.2 * sin(time - dt).
-                // dAngle = Angle(t) - Angle(t - dt).
-
-                // Oscillating motion: Open to Fully Closed
-                // Initial state in generateScissors has arms at +/- 0.6 radians (Open).
-                // We want to oscillate the arm angle between 0.6 (Open) and 0 (Fully Closed).
-                // Start at open (0.6) so no jump at t=0.
-
-                const scissorsTime = currentTime * 0.001
-                const speed = 4.0
-
-                // Angle of ONE arm relative to vertical axis
-                // Range: [0, 0.6] - When closed (0), blades fully meet; when open (0.6), scissors are open
-                // Add phase offset (π) so cos starts at -1 -> 0.3 - 0.3*(-1) = 0.6 (Open at t=0)
-                // Then oscillates to cos=1 -> 0.3 - 0.3*1 = 0 (Fully Closed)
-                const armAngleNow = 0.3 - 0.3 * Math.cos(scissorsTime * speed + Math.PI)
-                const armAnglePrev = 0.3 - 0.3 * Math.cos((scissorsTime - deltaTime) * speed + Math.PI)
-
-                // Change in angle this frame
-                // If closing (Now < Prev), dAngle is negative.
-                const dAngle = armAngleNow - armAnglePrev
-
-                // Arm 1 (Left Blade, +Angle): rotates by +dAngle
-                // Arm 2 (Right Blade, -Angle): rotates by -dAngle
-
-                // Arm 1 rotates +dAngle
-                // Arm 2 rotates -dAngle (opposite)
-
-                const cos1 = Math.cos(dAngle)
-                const sin1 = Math.sin(dAngle)
-                const cos2 = Math.cos(-dAngle)
-                const sin2 = Math.sin(-dAngle)
-
-                const pivotY = 0.0 // Must match generated pivot offset
+                // Seconds: 60s = 360deg
+                const sAngle = -(s / 60) * Math.PI * 2
+                // Minutes: 60m = 360deg
+                const mAngle = -(m / 60) * Math.PI * 2
+                // Hours: 12h = 360deg
+                const hAngle = -(h / 12) * Math.PI * 2
 
                 for (let i = 0; i < particleCount; i++) {
-                    const armIdx = armIndices[i]
-                    const i3 = i * 3
+                    const hType = handIndices[i]
+                    if (hType > 0) { // Moving hand particle
+                        const i3 = i * 3
 
-                    // Translate to pivot (subtract pivotY)
-                    let x = positions[i3]
-                    let y = positions[i3 + 1] - pivotY
-                    let z = positions[i3 + 2]
+                        // Pick angle
+                        let angle = 0
+                        if (hType === 1) angle = hAngle
+                        else if (hType === 2) angle = mAngle
+                        else if (hType === 3) angle = sAngle
 
-                    // Rotate
-                    let nx, ny
-                    if (armIdx === 0) { // Arm 1
-                        nx = x * cos1 - y * sin1
-                        ny = x * sin1 + y * cos1
-                    } else { // Arm 2
-                        nx = x * cos2 - y * sin2
-                        ny = x * sin2 + y * cos2
+                        // Get BASE position (Upright 12:00)
+                        const bx = baseHandPositions[i3]
+                        const by = baseHandPositions[i3 + 1]
+                        const bz = baseHandPositions[i3 + 2]
+
+                        // Rotate around Z axis
+                        const cos = Math.cos(angle)
+                        const sin = Math.sin(angle)
+
+                        // x' = x cos - y sin
+                        // y' = x sin + y cos
+                        positions[i3] = bx * cos - by * sin
+                        positions[i3 + 1] = bx * sin + by * cos
+                        positions[i3 + 2] = bz
                     }
-
-                    // Translate back
-                    positions[i3] = nx
-                    positions[i3 + 1] = ny + pivotY
-                    positions[i3 + 2] = z
                 }
 
                 // Sync if fully morphed
@@ -1430,14 +1425,14 @@ export function ParticleMorph({
                 // Yaw (Y): Coupled with Roll for realism
                 // We add roll * 0.5 to yaw to simulate banking turn logic
                 sceneRef.current.particles.rotation.y = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
-            } else if (isScissors) {
-                // Scissors Animation: Rotate 360 around Z axis (Vertical <-> Horizontal)
-                // Spin around the center (screen plane) - FASTER
-                sceneRef.current.particles.rotation.z += currentRotationSpeed * 2.5 * deltaTime
+            } else if (isClock) {
+                // Clock handles its own internal rotation (hands)
+                // We just need to stop the global rotation from "else" block
 
-                // Reset other axes
-                sceneRef.current.particles.rotation.x = 0
-                sceneRef.current.particles.rotation.y = 0
+                // Perhaps a gentle sway for the whole clock?
+                sceneRef.current.particles.rotation.z = Math.sin(currentTime * 0.0005) * 0.05
+                sceneRef.current.particles.rotation.x = Math.sin(currentTime * 0.0003) * 0.05
+                sceneRef.current.particles.rotation.y = 0 // Keep facing forward
             } else if (!isCamera) { // Don't rotate camera here, it has its own logic
                 // Continually rotate for other shapes
                 sceneRef.current.particles.rotation.y += currentRotationSpeed * deltaTime
@@ -1486,7 +1481,7 @@ export function ParticleMorph({
         const newTarget = getTargetPositions(target, particleCount)
 
         if (target === 'curation') {
-            console.log('ParticleMorph: generated curation/scissors data', sceneRef.current.scissorsData)
+            console.log('ParticleMorph: generated curation/clock data', sceneRef.current.clockData)
         }
 
         // Sync base positions with current state

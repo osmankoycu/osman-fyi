@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -10,12 +10,26 @@ import { usePlaneAnimation } from '../hooks/usePlaneAnimation'
 import { useParticleMorph } from '../contexts/ParticleMorphContext'
 import { MorphTarget } from './ParticleMorph'
 
+// Helper to determine target based on path
+const getTargetForPath = (pathname: string): MorphTarget => {
+    if (pathname === '/' || pathname === '/product') return 'cube'
+    if (pathname.startsWith('/experiments')) return 'atom'
+    if (pathname.startsWith('/photography')) return 'camera'
+    if (pathname.startsWith('/curation')) return 'curation'
+    if (pathname.startsWith('/about')) return 'hand'
+    return 'default'
+}
+
 export function Navbar() {
     const pathname = usePathname()
     const [isStuck, setIsStuck] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const { setCurrentTarget } = useParticleMorph()
     usePlaneAnimation(isStuck)
+
+    // Refs for navigation animation logic
+    const isNavigationAnimating = useRef(false)
+    const navigationTimer = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -51,6 +65,43 @@ export function Navbar() {
         }
     }, [isMobileMenuOpen])
 
+    // Handle route changes for particle animation
+    useEffect(() => {
+        const target = getTargetForPath(pathname)
+
+        if (target !== 'default') {
+            setCurrentTarget(target)
+            isNavigationAnimating.current = true
+
+            // Clear existing timer if any
+            if (navigationTimer.current) {
+                clearTimeout(navigationTimer.current)
+            }
+
+            // Set timer to disperse after 3 seconds
+            navigationTimer.current = setTimeout(() => {
+                isNavigationAnimating.current = false
+                setCurrentTarget('default')
+                navigationTimer.current = null
+            }, 3000)
+        } else {
+            // If defaulting (e.g. unknown page), ensure we are default
+            // But usually we animate to default.
+            // setCurrentTarget('default')
+            // Don't force default if navigating away? 
+            // If I navigate to unknown page, it should probably clear.
+            if (isNavigationAnimating.current) {
+                isNavigationAnimating.current = false
+                if (navigationTimer.current) clearTimeout(navigationTimer.current)
+            }
+            setCurrentTarget('default')
+        }
+
+        return () => {
+            if (navigationTimer.current) clearTimeout(navigationTimer.current)
+        }
+    }, [pathname, setCurrentTarget])
+
     const navItems = [
         { label: 'Product', href: '/', morphTarget: 'cube' as MorphTarget },
         { label: 'Experiments', href: '/experiments', morphTarget: 'atom' as MorphTarget },
@@ -62,10 +113,18 @@ export function Navbar() {
 
     // Handle hover events for particle morph
     const handleNavHover = (morphTarget: MorphTarget) => {
+        // If user hovers, cancel the navigation timer and force the new target
+        if (navigationTimer.current) {
+            clearTimeout(navigationTimer.current)
+            navigationTimer.current = null
+        }
+        isNavigationAnimating.current = false
         setCurrentTarget(morphTarget)
     }
 
     const handleNavLeave = () => {
+        // Only disperse if we are NOT in the middle of a navigation animation
+        if (isNavigationAnimating.current) return
         setCurrentTarget('default')
     }
 

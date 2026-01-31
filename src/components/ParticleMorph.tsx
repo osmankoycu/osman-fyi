@@ -1305,8 +1305,12 @@ export function ParticleMorph({
                 // Higher speed (12.0) is needed here to ensure the "Spring" animation (overshoot) 
                 // is actually visible and not smoothed out, while still preventing instant snapping on shape entry.
                 const rotLerpSpeed = 12.0
+
+                // Add subtle sway (Up/Down breathing) only on X axis
+                const swayX = Math.sin(currentTime * 0.0005) * 0.08
+
                 sceneRef.current.particles.rotation.y = lerpRot(sceneRef.current.particles.rotation.y, targetYRot, rotLerpSpeed, deltaTime)
-                sceneRef.current.particles.rotation.x = lerpRot(sceneRef.current.particles.rotation.x, 0, rotLerpSpeed, deltaTime)
+                sceneRef.current.particles.rotation.x = lerpRot(sceneRef.current.particles.rotation.x, swayX, rotLerpSpeed, deltaTime)
                 sceneRef.current.particles.rotation.z = lerpRot(sceneRef.current.particles.rotation.z, 0, rotLerpSpeed, deltaTime)
 
                 // --- 2. SHUTTER / APERTURE TRIGGER ---

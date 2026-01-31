@@ -45,6 +45,7 @@ export function ParticleMorph({
         cameraData?: {
             shutterIndices: Int8Array // 1 for shutter button, 0 for other parts
             baseShutterPositions?: Float32Array // Store base positions for animation
+            startTime?: number
         }
     } | null>(null)
 
@@ -1222,7 +1223,14 @@ export function ParticleMorph({
                 // 6.5-7.5s: Return Center
 
                 const loopDuration = 7.5 // Faster loop
-                const t = (currentTime * 0.001) % loopDuration
+
+                // Reset animation to start on frame 0 when switching to camera
+                // This ensures we start from rotation 0 (Center), matching the Atom/Default state.
+                if (sceneRef.current.cameraData.startTime === undefined) {
+                    sceneRef.current.cameraData.startTime = currentTime
+                }
+                const animTime = currentTime - sceneRef.current.cameraData.startTime
+                const t = (animTime * 0.001) % loopDuration
 
                 // Spring Easing (Overshoot)
                 const easeOutBack = (x: number): number => {
@@ -1267,9 +1275,12 @@ export function ParticleMorph({
                 }
 
                 // Smoothly interpolate to target rotation using shortest path
-                const rotLerpSpeed = 3.0
+                // Higher speed (12.0) is needed here to ensure the "Spring" animation (overshoot) 
+                // is actually visible and not smoothed out, while still preventing instant snapping on shape entry.
+                const rotLerpSpeed = 12.0
                 sceneRef.current.particles.rotation.y = lerpRot(sceneRef.current.particles.rotation.y, targetYRot, rotLerpSpeed, deltaTime)
                 sceneRef.current.particles.rotation.x = lerpRot(sceneRef.current.particles.rotation.x, 0, rotLerpSpeed, deltaTime)
+                sceneRef.current.particles.rotation.z = lerpRot(sceneRef.current.particles.rotation.z, 0, rotLerpSpeed, deltaTime)
 
                 // --- 2. SHUTTER / APERTURE TRIGGER ---
                 // Triggers: 0.2, 2.6, 5.1

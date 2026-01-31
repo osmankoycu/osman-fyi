@@ -27,9 +27,13 @@ export function Navbar() {
     const { setCurrentTarget } = useParticleMorph()
     usePlaneAnimation(isStuck)
 
+    // Configurable delay for hover leave (in milliseconds)
+    const LEAVE_DELAY = 600
+
     // Refs for navigation animation logic
     const isNavigationAnimating = useRef(false)
     const navigationTimer = useRef<NodeJS.Timeout | null>(null)
+    const leaveTimer = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -77,6 +81,10 @@ export function Navbar() {
             if (navigationTimer.current) {
                 clearTimeout(navigationTimer.current)
             }
+            if (leaveTimer.current) {
+                clearTimeout(leaveTimer.current)
+                leaveTimer.current = null
+            }
 
             // Set timer to disperse after 3 seconds
             navigationTimer.current = setTimeout(() => {
@@ -94,11 +102,16 @@ export function Navbar() {
                 isNavigationAnimating.current = false
                 if (navigationTimer.current) clearTimeout(navigationTimer.current)
             }
+            if (leaveTimer.current) {
+                clearTimeout(leaveTimer.current)
+                leaveTimer.current = null
+            }
             setCurrentTarget('default')
         }
 
         return () => {
             if (navigationTimer.current) clearTimeout(navigationTimer.current)
+            if (leaveTimer.current) clearTimeout(leaveTimer.current)
         }
     }, [pathname, setCurrentTarget])
 
@@ -113,6 +126,12 @@ export function Navbar() {
 
     // Handle hover events for particle morph
     const handleNavHover = (morphTarget: MorphTarget) => {
+        // Clear any pending leave timer
+        if (leaveTimer.current) {
+            clearTimeout(leaveTimer.current)
+            leaveTimer.current = null
+        }
+
         // If user hovers, cancel the navigation timer and force the new target
         if (navigationTimer.current) {
             clearTimeout(navigationTimer.current)
@@ -125,7 +144,12 @@ export function Navbar() {
     const handleNavLeave = () => {
         // Only disperse if we are NOT in the middle of a navigation animation
         if (isNavigationAnimating.current) return
-        setCurrentTarget('default')
+
+        // Set a delay before resetting to default
+        leaveTimer.current = setTimeout(() => {
+            setCurrentTarget('default')
+            leaveTimer.current = null
+        }, LEAVE_DELAY)
     }
 
     const isLight = pathname !== '/photography'

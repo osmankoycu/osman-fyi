@@ -850,9 +850,9 @@ export function ParticleMorph({
             // Add slight noise for "paper texture" / thickness
             const noise = 0.02
 
-            positions[pIndex * 3] = px + (Math.random() - 0.5) * noise
+            positions[pIndex * 3] = -(px + (Math.random() - 0.5) * noise) // Invert X for 180 deg rotation
             positions[pIndex * 3 + 1] = py + (Math.random() - 0.5) * noise
-            positions[pIndex * 3 + 2] = pz + (Math.random() - 0.5) * noise
+            positions[pIndex * 3 + 2] = -(pz + (Math.random() - 0.5) * noise) // Invert Z for 180 deg rotation
 
             pIndex++
         }
@@ -1257,8 +1257,19 @@ export function ParticleMorph({
                     targetYRot = (-Math.PI / 4) + ease * (Math.PI / 4);
                 }
 
-                sceneRef.current.particles.rotation.y = targetYRot;
-                sceneRef.current.particles.rotation.x = 0;
+                // Helper to interpolate visible rotation via shortest path
+                const lerpRot = (current: number, target: number, speed: number, dt: number) => {
+                    let delta = target - current
+                    // Normalize delta to -PI to +PI
+                    while (delta > Math.PI) delta -= Math.PI * 2
+                    while (delta < -Math.PI) delta += Math.PI * 2
+                    return current + delta * speed * dt
+                }
+
+                // Smoothly interpolate to target rotation using shortest path
+                const rotLerpSpeed = 3.0
+                sceneRef.current.particles.rotation.y = lerpRot(sceneRef.current.particles.rotation.y, targetYRot, rotLerpSpeed, deltaTime)
+                sceneRef.current.particles.rotation.x = lerpRot(sceneRef.current.particles.rotation.x, 0, rotLerpSpeed, deltaTime)
 
                 // --- 2. SHUTTER / APERTURE TRIGGER ---
                 // Triggers: 0.2, 2.6, 5.1
@@ -1370,13 +1381,20 @@ export function ParticleMorph({
 
             // Apply rotation
             if (isDefault) {
-                // Smoothly return to nearest aligned rotation (0, 180, 360, etc.)
-                // This ensures the wide cloud faces the camera without spinning back wildly
+                // Smoothly return to nearest fully aligned rotation (0, 360, 720, etc.)
+                // We align to 2*PI to ensure we don't lock at 180 degrees (backwards),
+                // which causes large rotations when switching to directional shapes like Hand/Plane.
                 const currentRot = sceneRef.current.particles.rotation.y
-                const targetRot = Math.round(currentRot / Math.PI) * Math.PI
+                const TWO_PI = Math.PI * 2
+                const targetRot = Math.round(currentRot / TWO_PI) * TWO_PI
 
-                // Interpolate towards the nearest flat angle
-                sceneRef.current.particles.rotation.y += (targetRot - currentRot) * deltaTime * 2.0
+                // Interpolate towards the nearest flat angle using shortest path logic
+                let dY = targetRot - currentRot
+                // Normalize delta
+                while (dY > Math.PI) dY -= TWO_PI
+                while (dY < -Math.PI) dY += TWO_PI
+
+                sceneRef.current.particles.rotation.y += dY * deltaTime * 3.0
 
                 // Return to 0 tilt (X and Z)
                 sceneRef.current.particles.rotation.x *= 0.95
@@ -1385,16 +1403,26 @@ export function ParticleMorph({
                 // Waving animation for hand
 
                 // 1. Vertical 3D Rotation (Y-Axis Swivel)
-                // Rotates the hand left and right to show 3D depth ("dikeyde 3d rotate")
-                sceneRef.current.particles.rotation.y = Math.sin(currentTime * 0.0015) * 0.6
+                const targetRotY = Math.sin(currentTime * 0.0015) * 0.6
 
-                // 2. Tie Z-Axis Wave to Y-Rotation for natural feel?
-                // Or keep independent. Independent is fine.
-                const waveAngle = Math.sin(currentTime * 0.004) * 0.25 // +/- ~15 degrees
-                sceneRef.current.particles.rotation.z = waveAngle
+                let dY = targetRotY - sceneRef.current.particles.rotation.y
+                while (dY > Math.PI) dY -= Math.PI * 2
+                while (dY < -Math.PI) dY += Math.PI * 2
+                sceneRef.current.particles.rotation.y += dY * deltaTime * 3.0
+
+                // 2. Tie Z-Axis Wave
+                const waveAngle = Math.sin(currentTime * 0.004) * 0.25
+                let dZ = waveAngle - sceneRef.current.particles.rotation.z
+                while (dZ > Math.PI) dZ -= Math.PI * 2
+                while (dZ < -Math.PI) dZ += Math.PI * 2
+                sceneRef.current.particles.rotation.z += dZ * deltaTime * 3.0
 
                 // 3. Slight X-Axis breathing
-                sceneRef.current.particles.rotation.x = Math.sin(currentTime * 0.001) * 0.05
+                const targetRotX = Math.sin(currentTime * 0.001) * 0.05
+                let dX = targetRotX - sceneRef.current.particles.rotation.x
+                while (dX > Math.PI) dX -= Math.PI * 2
+                while (dX < -Math.PI) dX += Math.PI * 2
+                sceneRef.current.particles.rotation.x += dX * deltaTime * 3.0
             } else if (sceneRef.current.currentTarget === 'plane') {
                 // Gliding animation for paper plane
 
@@ -1402,9 +1430,9 @@ export function ParticleMorph({
                 // Adjust these values to change the plane's flight path
                 const config = {
                     // Base Angles (Radians)
-                    baseX: 0.5,       // Pitch: Positive = Nose Down (Tail up), reveals Top surface strongly
-                    baseY: Math.PI - 0.6, // Yaw: Facing diagonally LEFT
-                    baseZ: -0.1,      // Roll: Banking LEFT
+                    baseX: 0.5,       // Pitch
+                    baseY: -0.6,      // Yaw: -0.6 (approx -35 deg) + inverted geometry = same visual as old 145 deg
+                    baseZ: -0.1,      // Roll
 
                     // Animation Intensity (Sway amount)
                     swayX: 0.05,      // Pitch fluctuation
@@ -1415,30 +1443,69 @@ export function ParticleMorph({
 
                 const time = currentTime * 0.001
 
-                // Roll (Z): Gentle sway
+                const lerpSpeed = 3.0
+
+                // Roll (Z)
                 const roll = Math.sin(time * 1.5) * config.swayZ
-                sceneRef.current.particles.rotation.z = config.baseZ + roll
+                const targetRotZ = config.baseZ + roll
 
-                // Pitch (X): Base ascent + slight fluctuation
-                sceneRef.current.particles.rotation.x = config.baseX + Math.sin(time * 1.0) * config.swayX
+                let dZ = targetRotZ - sceneRef.current.particles.rotation.z
+                while (dZ > Math.PI) dZ -= Math.PI * 2
+                while (dZ < -Math.PI) dZ += Math.PI * 2
+                sceneRef.current.particles.rotation.z += dZ * deltaTime * lerpSpeed
 
-                // Yaw (Y): Coupled with Roll for realism
-                // We add roll * 0.5 to yaw to simulate banking turn logic
-                sceneRef.current.particles.rotation.y = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
+                // Pitch (X)
+                const targetRotX = config.baseX + Math.sin(time * 1.0) * config.swayX
+
+                let dX = targetRotX - sceneRef.current.particles.rotation.x
+                while (dX > Math.PI) dX -= Math.PI * 2
+                while (dX < -Math.PI) dX += Math.PI * 2
+                sceneRef.current.particles.rotation.x += dX * deltaTime * lerpSpeed
+
+                // Yaw (Y)
+                const targetRotY = config.baseY + Math.sin(time * 0.5) * config.swayY + roll * 0.5
+
+                let dY = targetRotY - sceneRef.current.particles.rotation.y
+                while (dY > Math.PI) dY -= Math.PI * 2
+                while (dY < -Math.PI) dY += Math.PI * 2
+                sceneRef.current.particles.rotation.y += dY * deltaTime * lerpSpeed
             } else if (isClock) {
                 // Clock handles its own internal rotation (hands)
                 // We just need to stop the global rotation from "else" block
 
                 // Perhaps a gentle sway for the whole clock?
-                sceneRef.current.particles.rotation.z = Math.sin(currentTime * 0.0005) * 0.05
-                sceneRef.current.particles.rotation.x = Math.sin(currentTime * 0.0003) * 0.05
-                sceneRef.current.particles.rotation.y = 0 // Keep facing forward
+                const targetRotZ = Math.sin(currentTime * 0.0005) * 0.05
+                const targetRotX = Math.sin(currentTime * 0.0003) * 0.05
+
+                const lerpSpeed = 3.0
+
+                let dZ = targetRotZ - sceneRef.current.particles.rotation.z
+                while (dZ > Math.PI) dZ -= Math.PI * 2
+                while (dZ < -Math.PI) dZ += Math.PI * 2
+                sceneRef.current.particles.rotation.z += dZ * deltaTime * lerpSpeed
+
+                let dX = targetRotX - sceneRef.current.particles.rotation.x
+                while (dX > Math.PI) dX -= Math.PI * 2
+                while (dX < -Math.PI) dX += Math.PI * 2
+                sceneRef.current.particles.rotation.x += dX * deltaTime * lerpSpeed
+
+                let dY = 0 - sceneRef.current.particles.rotation.y
+                while (dY > Math.PI) dY -= Math.PI * 2
+                while (dY < -Math.PI) dY += Math.PI * 2
+                sceneRef.current.particles.rotation.y += dY * deltaTime * lerpSpeed // Return to forward
             } else if (!isCamera) { // Don't rotate camera here, it has its own logic
                 // Continually rotate for other shapes
                 sceneRef.current.particles.rotation.y += currentRotationSpeed * deltaTime
 
-                // Slight tilt effect for 3D feel
-                sceneRef.current.particles.rotation.x = Math.sin(currentTime * 0.0003) * 0.1
+                // Slight tilt effect for 3D feel (Smoothly interpolated)
+                const targetRotX = Math.sin(currentTime * 0.0003) * 0.1
+                const lerpSpeed = 3.0 // Consistent with others
+
+                // Shortest path for X (though usually small, good practice)
+                let dX = targetRotX - sceneRef.current.particles.rotation.x
+                while (dX > Math.PI) dX -= Math.PI * 2
+                while (dX < -Math.PI) dX += Math.PI * 2
+                sceneRef.current.particles.rotation.x += dX * deltaTime * lerpSpeed
             }
 
             renderer.render(scene, camera)

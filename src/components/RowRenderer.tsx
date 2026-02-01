@@ -13,13 +13,15 @@ import { motion } from 'framer-motion'
 interface RowRendererProps {
     rows?: RowData[]
     aspectRatio?: 'video' | '3/2'
+    enableWidePacking?: boolean
 }
 
 // ...
-export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
+export function RowRenderer({ rows, aspectRatio = 'video', enableWidePacking = true }: RowRendererProps) {
     const [isWide, setIsWide] = useState(false)
     const pathname = usePathname()
     const is3By2 = aspectRatio === '3/2'
+    const shouldUseWideLayout = isWide && enableWidePacking
 
     useEffect(() => {
         const checkWidth = () => {
@@ -36,7 +38,7 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
 
     // packing logic
     const displayedRows = useMemo(() => {
-        if (!isWide) return rows
+        if (!isWide || !enableWidePacking) return rows
 
         const packed: (RowData | PackedRowPair)[] = []
         let i = 0
@@ -78,7 +80,9 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
             }
         }
         return packed
-    }, [rows, isWide])
+    }, [rows, isWide, enableWidePacking])
+
+    const isReduceHeight = !enableWidePacking
 
     const aspectClass = is3By2 ? 'aspect-[3/2]' : 'aspect-video'
     const wideTotalRatio = is3By2 ? '2.25' : '2.66'
@@ -109,6 +113,7 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                                         className="absolute inset-0 w-full h-full"
                                         fillContainer
                                         sizes="(max-width: 1440px) 100vw, 66vw"
+                                        enableWidePacking={enableWidePacking}
                                     />
                                 </div>
                                 <div className={clsx("w-full relative min-[1440px]:aspect-auto", aspectClass)}>
@@ -118,6 +123,7 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                                         className="absolute inset-0 w-full h-full"
                                         fillContainer
                                         sizes="(max-width: 1440px) 100vw, 33vw"
+                                        enableWidePacking={enableWidePacking}
                                     />
                                 </div>
                             </motion.div>
@@ -136,6 +142,7 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                                         className="absolute inset-0 w-full h-full"
                                         fillContainer
                                         sizes="(max-width: 1440px) 100vw, 33vw"
+                                        enableWidePacking={enableWidePacking}
                                     />
                                 </div>
                                 <div className={clsx("w-full relative", aspectClass)}>
@@ -144,6 +151,7 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                                         className="absolute inset-0 w-full h-full"
                                         fillContainer
                                         sizes="(max-width: 1440px) 100vw, 66vw"
+                                        enableWidePacking={enableWidePacking}
                                     />
                                 </div>
                             </motion.div>
@@ -170,6 +178,7 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                                     item={standardRow.items[0]}
                                     className="absolute inset-0 w-full h-full"
                                     sizes="100vw"
+                                    enableWidePacking={enableWidePacking}
                                 />
                             </div>
                         )}
@@ -187,27 +196,29 @@ export function RowRenderer({ rows, aspectRatio = 'video' }: RowRendererProps) {
                                             "md:grid-cols-2",
                                             // Apply aspect ratio on mobile only if it's double visual, otherwise keep md: prefix
                                             isDoubleVisual
-                                                ? (is3By2 ? "aspect-[3/2]" : "aspect-video")
-                                                : (is3By2 ? "md:aspect-[3/2]" : "md:aspect-video")
+                                                ? (isReduceHeight ? "aspect-[2/1]" : (is3By2 ? "aspect-[3/2]" : "aspect-video"))
+                                                : (isReduceHeight ? "md:aspect-[2/1]" : (is3By2 ? "md:aspect-[3/2]" : "md:aspect-video"))
                                         )}
-                                        style={{ aspectRatio: isWide ? wideTotalRatio : undefined }}
+                                        style={{ aspectRatio: shouldUseWideLayout ? wideTotalRatio : undefined }}
                                     >
                                         {standardRow.items.map((item, idx) => (
                                             <div
                                                 key={idx}
                                                 className={clsx(
-                                                    "w-full relative md:aspect-auto md:h-full",
+                                                    "w-full relative md:aspect-auto md:h-full min-h-0 overflow-hidden",
                                                     // If double visual, let it fill height (controlled by parent aspect ratio), otherwise square on mobile
                                                     isDoubleVisual ? "h-full" : "aspect-square"
                                                 )}
+                                                style={{ containerType: 'inline-size' }}
                                             >
                                                 {/* Aspect ratio control might be needed here or handled by ItemRenderer content */}
                                                 <ItemRenderer
                                                     item={item}
                                                     className="w-full h-full object-cover absolute inset-0"
                                                     fillContainer
-                                                    objectFit={isWide ? 'contain' : undefined}
+                                                    objectFit={shouldUseWideLayout ? 'contain' : undefined}
                                                     sizes="(max-width: 768px) 100vw, 50vw"
+                                                    enableWidePacking={enableWidePacking}
                                                 />
                                             </div>
                                         ))}
@@ -230,9 +241,9 @@ interface PackedRowPair {
     rowB: { primary: RowItem; secondary: RowItem; layout: 'small-large'; _key: string }
 }
 
-function ItemRenderer({ item, className, fillContainer, objectFit, sizes }: { item: RowItem, className?: string, fillContainer?: boolean, objectFit?: 'cover' | 'contain', sizes?: string }) {
+function ItemRenderer({ item, className, fillContainer, objectFit, sizes, enableWidePacking }: { item: RowItem, className?: string, fillContainer?: boolean, objectFit?: 'cover' | 'contain', sizes?: string, enableWidePacking?: boolean }) {
     if (item._type === 'imageCard') return <ImageCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} sizes={sizes} />
-    if (item._type === 'textCard') return <TextCard {...item} className={className} />
+    if (item._type === 'textCard') return <TextCard {...item} className={className} enableWidePacking={enableWidePacking} />
     if (item._type === 'videoCard') return <VideoCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} />
     return null
 }

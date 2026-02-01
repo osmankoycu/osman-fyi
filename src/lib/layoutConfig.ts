@@ -1,0 +1,3 @@
+export const ENABLE_PRODUCT_WIDE_PACKING = false;
+export const ENABLE_EXPERIMENT_WIDE_PACKING = false;
+export const ENABLE_PHOTOGRAPHY_WIDE_PACKING = true;

@@ -2,6 +2,7 @@ import { client } from '@/lib/sanity.client'
 import { photoCitiesQuery } from '@/lib/sanity.queries'
 import { PhotoCityData } from '@/types'
 import { RowRenderer } from '@/components/RowRenderer'
+import { ENABLE_PHOTOGRAPHY_WIDE_PACKING } from '@/lib/layoutConfig'
 
 export const revalidate = 60
 
@@ -53,7 +54,7 @@ export default async function PhotographyPage() {
 
                             {/* Inline Photo Rows - Image Container (1200px) */}
                             <div className="max-w-[1920px] mx-auto w-full px-0 md:px-5 lg:px-10">
-                                <RowRenderer rows={city.rows} aspectRatio="3/2" />
+                                <RowRenderer rows={city.rows} aspectRatio="3/2" enableWidePacking={ENABLE_PHOTOGRAPHY_WIDE_PACKING} />
                             </div>
                         </article>
                     ))}

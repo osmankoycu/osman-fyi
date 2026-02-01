@@ -4,6 +4,7 @@ import { RowData, RowItem } from '@/types'
 import { ImageCard } from './ImageCard'
 import { TextCard } from './TextCard'
 import { VideoCard } from './VideoCard'
+import { CarouselCard } from './CarouselCard'
 import { clsx } from 'clsx'
 import React, { useState, useEffect, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
@@ -186,7 +187,7 @@ export function RowRenderer({ rows, aspectRatio = 'video', enableWidePacking = t
                         {standardRow.layout === 'two' && (
                             // Check if both items are visual (non-text) to enable side-by-side on mobile
                             (() => {
-                                const isDoubleVisual = standardRow.items.every(item => item._type === 'imageCard' || item._type === 'videoCard')
+                                const isDoubleVisual = standardRow.items.every(item => item._type === 'imageCard' || item._type === 'videoCard' || item._type === 'carouselCard')
 
                                 return (
                                     <div
@@ -245,5 +246,6 @@ function ItemRenderer({ item, className, fillContainer, objectFit, sizes, enable
     if (item._type === 'imageCard') return <ImageCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} sizes={sizes} />
     if (item._type === 'textCard') return <TextCard {...item} className={className} enableWidePacking={enableWidePacking} />
     if (item._type === 'videoCard') return <VideoCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} />
+    if (item._type === 'carouselCard') return <CarouselCard {...item} className={className} fillContainer={fillContainer} objectFit={objectFit} sizes={sizes} />
     return null
 }

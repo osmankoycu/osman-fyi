@@ -28,7 +28,7 @@ export const row = defineType({
             name: 'items',
             title: 'Items',
             type: 'array',
-            of: [{ type: 'imageCard' }, { type: 'textCard' }, { type: 'videoCard' }],
+            of: [{ type: 'imageCard' }, { type: 'textCard' }, { type: 'videoCard' }, { type: 'carouselCard' }],
             validation: (rule) =>
                 rule.custom((items, context) => {
                     // @ts-ignore

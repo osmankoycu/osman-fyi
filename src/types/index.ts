@@ -46,7 +46,13 @@ export interface VideoCardData {
     alt?: string
 }
 
-export type RowItem = ImageCardData | TextCardData | VideoCardData
+export interface CarouselCardData {
+    _type: 'carouselCard'
+    images: SanityImage[]
+    backgroundColor?: string
+}
+
+export type RowItem = ImageCardData | TextCardData | VideoCardData | CarouselCardData
 
 export interface RowData {
     _key: string

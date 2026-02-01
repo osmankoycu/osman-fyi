@@ -8,8 +8,9 @@ import { row } from './objects/row'
 import { imageCard } from './objects/imageCard'
 import { textCard } from './objects/textCard'
 import { videoCard } from './objects/videoCard'
+import { carouselCard } from './objects/carouselCard'
 import { about } from './about'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [product, experiment, photoCity, curationCategory, curationItem, row, imageCard, textCard, videoCard, about],
+  types: [product, experiment, photoCity, curationCategory, curationItem, row, imageCard, textCard, videoCard, carouselCard, about],
 }

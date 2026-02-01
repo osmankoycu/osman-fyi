@@ -31,6 +31,15 @@ export const projectsByTypeQuery = groq`
             asset -> {
                 url
             }
+        },
+        images[] {
+            ...,
+            asset->{
+                ...,
+                metadata {
+                    dimensions
+                }
+            }
         }
       }
     }
@@ -62,7 +71,16 @@ export const photoCitiesQuery = groq`
         alt,
         caption,
         backgroundColor,
-        textColor
+        textColor,
+        images[] {
+            ...,
+            asset->{
+                ...,
+                metadata {
+                    dimensions
+                }
+            }
+        }
       }
     }
   }

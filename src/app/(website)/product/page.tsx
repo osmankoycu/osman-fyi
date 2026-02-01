@@ -2,6 +2,7 @@ import { client } from '@/lib/sanity.client'
 import { projectsByTypeQuery } from '@/lib/sanity.queries'
 import { ProjectData } from '@/types'
 import { RowRenderer } from '@/components/RowRenderer'
+import { ENABLE_PRODUCT_WIDE_PACKING } from '@/lib/layoutConfig'
 
 export const revalidate = 60
 
@@ -52,7 +53,7 @@ export default async function ProductPage() {
 
                             {/* Project Rows - Aligned with Header Container */}
                             <div className="max-w-[1920px] mx-auto w-full px-0 md:px-5 lg:px-10">
-                                <RowRenderer rows={project.rows} />
+                                <RowRenderer rows={project.rows} enableWidePacking={ENABLE_PRODUCT_WIDE_PACKING} />
                             </div>
                         </article>
                     ))

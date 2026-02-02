@@ -186,46 +186,33 @@ export function RowRenderer({ rows, aspectRatio = 'video', enableWidePacking = t
 
                         {standardRow.layout === 'two' && (
                             // Check if both items are visual (non-text) to enable side-by-side on mobile
-                            (() => {
-                                const isDoubleVisual = standardRow.items.every(item => item._type === 'imageCard' || item._type === 'videoCard' || item._type === 'carouselCard')
-
-                                return (
+                            // content rendered below
+                            <div
+                                className={clsx(
+                                    "grid gap-[2px] items-stretch grid-cols-1 md:grid-cols-2",
+                                    isReduceHeight
+                                        ? "md:aspect-[2/1]"
+                                        : (is3By2 ? "md:aspect-[3/2]" : "md:aspect-video")
+                                )}
+                                style={{ aspectRatio: shouldUseWideLayout ? wideTotalRatio : undefined }}
+                            >
+                                {standardRow.items.map((item, idx) => (
                                     <div
-                                        className={clsx(
-                                            "grid gap-[2px] items-stretch",
-                                            isDoubleVisual ? "grid-cols-2" : "grid-cols-1",
-                                            "md:grid-cols-2",
-                                            // Apply aspect ratio on mobile only if it's double visual, otherwise keep md: prefix
-                                            isDoubleVisual
-                                                ? (isReduceHeight ? "aspect-[2/1]" : (is3By2 ? "aspect-[3/2]" : "aspect-video"))
-                                                : (isReduceHeight ? "md:aspect-[2/1]" : (is3By2 ? "md:aspect-[3/2]" : "md:aspect-video"))
-                                        )}
-                                        style={{ aspectRatio: shouldUseWideLayout ? wideTotalRatio : undefined }}
+                                        key={idx}
+                                        className="w-full relative md:aspect-auto md:h-full min-h-0 overflow-hidden aspect-square"
+                                        style={{ containerType: 'inline-size' }}
                                     >
-                                        {standardRow.items.map((item, idx) => (
-                                            <div
-                                                key={idx}
-                                                className={clsx(
-                                                    "w-full relative md:aspect-auto md:h-full min-h-0 overflow-hidden",
-                                                    // If double visual, let it fill height (controlled by parent aspect ratio), otherwise square on mobile
-                                                    isDoubleVisual ? "h-full" : "aspect-square"
-                                                )}
-                                                style={{ containerType: 'inline-size' }}
-                                            >
-                                                {/* Aspect ratio control might be needed here or handled by ItemRenderer content */}
-                                                <ItemRenderer
-                                                    item={item}
-                                                    className="w-full h-full object-cover absolute inset-0"
-                                                    fillContainer
-                                                    objectFit={shouldUseWideLayout ? 'contain' : undefined}
-                                                    sizes="(max-width: 768px) 100vw, 50vw"
-                                                    enableWidePacking={enableWidePacking}
-                                                />
-                                            </div>
-                                        ))}
+                                        <ItemRenderer
+                                            item={item}
+                                            className="w-full h-full object-cover absolute inset-0"
+                                            fillContainer
+                                            objectFit={shouldUseWideLayout ? 'contain' : undefined}
+                                            sizes="(max-width: 768px) 100vw, 50vw"
+                                            enableWidePacking={enableWidePacking}
+                                        />
                                     </div>
-                                )
-                            })()
+                                ))}
+                            </div>
                         )}
                     </motion.section>
                 )
